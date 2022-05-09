@@ -14,6 +14,9 @@ dependencies {
     // hocon
     implementation("com.typesafe:config:1.4.2")
 
+    // clikt
+    implementation("com.github.ajalt.clikt:clikt:3.4.0")
+
     // lightningdevkit
     implementation("org.lightningdevkit:ldk-java:0.0.106.0")
 

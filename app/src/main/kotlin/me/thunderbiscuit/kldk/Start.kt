@@ -3,17 +3,9 @@ package me.thunderbiscuit.kldk
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.enums.ConfirmationTarget
 import org.ldk.structs.*
-import org.ldk.structs.FeeEstimator.FeeEstimatorInterface
-import org.ldk.structs.Logger.LoggerInterface
 import java.io.File
 
-fun main() {
-    println("Hello, ${Config.nodeName}!")
-
-    // startNode()
-}
-
-// the startNode function fires up the basic things we need for the node to operate
+// the me.thunderbiscuit.kldk.startNode function fires up the basic things we need for the node to operate
 fun startNode() {
     println("LDK starting...")
 
@@ -30,7 +22,7 @@ fun startNode() {
 
 // to create a FeeEstimator we need to provide an object that implement the FeeEstimatorInterface
 // which has 1 function: get_est_sat_per_1000_weight(conf_target: ConfirmationTarget?): Int
-object KldkFeeEstimator : FeeEstimatorInterface {
+object KldkFeeEstimator : FeeEstimator.FeeEstimatorInterface {
     override fun get_est_sat_per_1000_weight(confirmation_target: ConfirmationTarget?): Int {
         // we don't actually use the confirmation_target parameter and simply return 25_000 no matter what
         return 25_000
@@ -39,7 +31,7 @@ object KldkFeeEstimator : FeeEstimatorInterface {
 
 // to create a Logger we need to provide an object that implements the LoggerInterface
 // which has 1 function: log(record: Record?): Unit
-object KldkLogger : LoggerInterface {
+object KldkLogger : Logger.LoggerInterface {
     override fun log(record: Record?) {
         println("$record")
     }
@@ -100,4 +92,15 @@ object KldkEventHandler : ChannelManagerConstructor.EventHandler {
     override fun persist_network_graph(network_graph: ByteArray?) {
         println("Implement network graph persistence")
     }
+}
+
+object KldkFilter : Filter.FilterInterface {
+    override fun register_tx(txid: ByteArray?, script_pubkey: ByteArray?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun register_output(output: WatchedOutput?): Option_C2Tuple_usizeTransactionZZ {
+        TODO("Not yet implemented")
+    }
+
 }
