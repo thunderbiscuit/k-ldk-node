@@ -7,4 +7,9 @@ object Config {
 
     val nodeName: String = config.getString("kldk.nodeName")
     val homeDir: String = config.getString("kldk.homeDir")
+    val entropy: String = config.getString("kldk.entropy")
+    val latestBlockHash: String = config.getString("kldk.latestBlockHash")
+    val latestBlockHeight: Int = config.getInt("kldk.latestBlockHeight")
+    val network: String = config.getString("kldk.network")
+    val genesisHash: String = config.getString("kldk.genesisHash")
 }
