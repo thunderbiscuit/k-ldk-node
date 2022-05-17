@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.output.TermUi.echo
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.IOException
 import java.net.InetSocketAddress
@@ -27,6 +28,7 @@ fun main() {
                     ConnectToPeer(),
                     PrintFilesInHomeDirectory(),
                     PrintConfig(),
+                    TestCommand(),
                     Shutdown(),
                     Exit()
                 )
@@ -93,6 +95,17 @@ class PrintConfig : CliktCommand(name = "printconfig") {
         println(Config.latestBlockHeight)
         println(Config.network)
         println(Config.genesisHash)
+    }
+}
+
+class TestCommand : CliktCommand(name = "testcommand") {
+    override fun run() {
+        runBlocking {
+            val latestBlockHash = getLatestBlockHash()
+            val latestBlockHeight = getLatestBlockHeight()
+            echo("Latest block hash is $latestBlockHash")
+            echo("Latest block height is $latestBlockHeight")
+        }
     }
 }
 

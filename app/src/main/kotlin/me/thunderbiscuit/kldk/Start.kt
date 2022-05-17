@@ -1,5 +1,10 @@
 package me.thunderbiscuit.kldk
 
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.batteries.NioPeerHandler
 import org.ldk.enums.ConfirmationTarget
@@ -21,10 +26,10 @@ fun startNode() {
 
     val transactionBroadcaster: BroadcasterInterface = BroadcasterInterface.new_impl(KldkBroadcaster)
 
-    val network: Network = Network.LDKNetwork_Testnet
-    // val network: Network = if (Config.network == "regtest") Network.LDKNetwork_Regtest else Network.LDKNetwork_Testnet
-    val genesisHash = "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"
-    // val networkGraph = NetworkGraph.of(genesisHash.hexStringToByteArray().reversedArray())
+    // val network: Network = Network.LDKNetwork_Testnet
+    val network: Network = if (Config.network == "regtest") Network.LDKNetwork_Regtest else Network.LDKNetwork_Testnet
+    // val genesisHash = "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"
+    val networkGraph = NetworkGraph.of(Config.genesisHash.hexStringToByteArray().reversedArray())
 
     val persister: Persist = Persist.new_impl(KldkPersister)
 
@@ -187,4 +192,16 @@ object KldkFilter : Filter.FilterInterface {
         println("Registering the output...")
         return Option_C2Tuple_usizeTransactionZZ.none()
     }
+}
+
+suspend fun getLatestBlockHash(): String {
+    val client = HttpClient(CIO)
+    val response: HttpResponse = client.get("https://blockstream.info/testnet/api/blocks/tip/hash")
+    return response.body<String>()
+}
+
+suspend fun getLatestBlockHeight(): Int {
+    val client = HttpClient(CIO)
+    val response: HttpResponse = client.get("https://blockstream.info/testnet/api/blocks/tip/height")
+    return response.body<Int>()
 }

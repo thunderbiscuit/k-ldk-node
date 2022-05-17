@@ -17,6 +17,10 @@ dependencies {
     // clikt
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
 
+    // ktor
+    implementation("io.ktor:ktor-client-core:2.0.1")
+    implementation("io.ktor:ktor-client-cio:2.0.1")
+
     // lightningdevkit
     implementation("org.lightningdevkit:ldk-java:0.0.106.0")
 
