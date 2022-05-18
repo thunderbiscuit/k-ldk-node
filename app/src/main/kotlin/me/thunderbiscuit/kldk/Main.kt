@@ -11,7 +11,6 @@ import com.github.ajalt.clikt.parameters.types.int
 import kotlinx.coroutines.runBlocking
 import me.thunderbiscuit.kldk.network.connectPeer
 import me.thunderbiscuit.kldk.utils.listPeers
-import java.io.File
 import kotlin.system.exitProcess
 
 fun main() {
@@ -79,7 +78,9 @@ class ConnectToPeer : CliktCommand(help = "Connect to a peer", name = "connectpe
 
 class ListPeers : CliktCommand(name = "listpeers") {
     override fun run() {
-        echo(listPeers())
+        listPeers().forEachIndexed { index, peerPubkey ->
+            echo("Peer ${index + 1}: $peerPubkey")
+        }
     }
 }
 
