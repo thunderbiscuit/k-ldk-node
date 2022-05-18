@@ -1,6 +1,7 @@
 package me.thunderbiscuit.kldk.network
 
 import me.thunderbiscuit.kldk.nioPeerHandler
+import me.thunderbiscuit.kldk.utils.toByteArray
 import java.net.InetSocketAddress
 
 fun connectPeer(pubkey: String, hostname: String, port: Int): Unit {
