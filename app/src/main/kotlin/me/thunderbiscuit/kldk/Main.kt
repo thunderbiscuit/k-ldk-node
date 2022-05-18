@@ -27,8 +27,6 @@ fun main() {
                     StartNode(),
                     ConnectToPeer(),
                     ListPeers(),
-                    PrintFilesInHomeDirectory(),
-                    PrintConfig(),
                     TestCommand(),
                     Shutdown(),
                     Exit()
@@ -82,26 +80,6 @@ class ConnectToPeer : CliktCommand(help = "Connect to a peer", name = "connectpe
 class ListPeers : CliktCommand(name = "listpeers") {
     override fun run() {
         echo(listPeers())
-    }
-}
-
-class PrintFilesInHomeDirectory : CliktCommand(name = "printfiles") {
-    override fun run() {
-        File(Config.homeDir).walk().forEach {
-            println("File in your home directory: ${it.name}")
-        }
-    }
-}
-
-class PrintConfig : CliktCommand(name = "printconfig") {
-    override fun run() {
-        println("Node name: ${Config.nodeName}")
-        println(Config.homeDir)
-        println(Config.entropy)
-        println(Config.latestBlockHash)
-        println(Config.latestBlockHeight)
-        println(Config.network)
-        println(Config.genesisHash)
     }
 }
 
