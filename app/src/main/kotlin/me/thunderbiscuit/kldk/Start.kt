@@ -38,11 +38,11 @@ fun startNode() {
     val serializedChannelMonitorsList: MutableList<String> = mutableListOf()
     var serializedChannelManager: String? = null
     File(Config.homeDir).walk().forEach {
-        if (it.name.startsWith("channel-monitor")) {
+        if (it.name.startsWith("channelmonitor")) {
             val serializedMonitor: String = it.absoluteFile.readText(Charsets.UTF_8)
             serializedChannelMonitorsList.add(serializedMonitor)
         }
-        if (it.name.startsWith("channel-manager")) {
+        if (it.name.startsWith("channelmanager")) {
             serializedChannelManager = it.absoluteFile.readText(Charsets.UTF_8)
         }
     }
