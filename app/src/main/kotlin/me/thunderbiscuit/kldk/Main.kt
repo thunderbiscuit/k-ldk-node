@@ -9,8 +9,9 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
 import kotlinx.coroutines.runBlocking
+import me.thunderbiscuit.kldk.network.connectPeer
+import me.thunderbiscuit.kldk.utils.listPeers
 import java.io.File
-import java.net.InetSocketAddress
 import kotlin.system.exitProcess
 
 fun main() {
@@ -69,6 +70,7 @@ class ConnectToPeer : CliktCommand(help = "Connect to a peer", name = "connectpe
     private val ip by option("--ip", help="Peer ip address (required)").required()
     private val port by option("--port", help="Peer port (required)").int().required()
     override fun run() {
+        echo("Kldk attempting to connect to peer $pubkey@$ip:$port...")
         connectPeer(
             pubkey = pubkey,
             hostname = ip,
@@ -125,26 +127,4 @@ class Exit : CliktCommand(help = "Exit REPL") {
         echo("Exiting the REPL...")
         exitProcess(0)
     }
-}
-
-fun connectPeer(pubkey: String, hostname: String, port: Int): Unit {
-    println("Kldk attempting to connect to peer $pubkey@$hostname:$port...")
-    return try {
-        nioPeerHandler?.connect(
-            pubkey.toByteArray(),
-            InetSocketAddress(hostname, port),
-            5000
-        ) ?: throw(IllegalStateException("nioPeerHandler was not initialized"))
-        println("Kldk successfully connected to peer $pubkey")
-    } catch (e: Throwable) {
-        println("Connect to peer exception: ${e.message}")
-    }
-}
-
-fun listPeers(): List<String> {
-    val peersByteArray = peerManager?.get_peer_node_ids() ?: throw (IllegalStateException("peerManager was not initialized"))
-    val peersList = peersByteArray.map {
-        it.toHex()
-    }
-    return peersList
 }

@@ -1,4 +1,4 @@
-package me.thunderbiscuit.kldk
+package me.thunderbiscuit.kldk.utils
 
 fun ByteArray.toHex(): String {
     return joinToString(separator = "") { byte ->
