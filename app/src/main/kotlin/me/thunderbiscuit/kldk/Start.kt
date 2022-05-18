@@ -6,6 +6,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import me.thunderbiscuit.kldk.utils.toHex
+import me.thunderbiscuit.kldk.utils.toByteArray
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.batteries.NioPeerHandler
 import org.ldk.enums.ConfirmationTarget
@@ -29,7 +30,7 @@ fun startNode() {
 
     // val network: Network = Network.LDKNetwork_Testnet
     val network: Network = if (Config.network == "regtest") Network.LDKNetwork_Regtest else Network.LDKNetwork_Testnet
-    val networkGraph = NetworkGraph.of(Config.genesisHash.toByteArray().reversedArray())
+    val networkGraph = NetworkGraph.of((Config.genesisHash.toByteArray()).reversedArray())
 
     val persister: Persist = Persist.new_impl(KldkPersister)
 
