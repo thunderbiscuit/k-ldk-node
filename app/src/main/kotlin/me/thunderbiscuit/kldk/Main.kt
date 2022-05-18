@@ -126,7 +126,7 @@ fun connectPeer(pubkey: String, hostname: String, port: Int): Unit {
     println("Kldk attempting to connect to peer $pubkey")
     return try {
         nioPeerHandler!!.connect(
-            pubkey.hexStringToByteArray(),
+            pubkey.toByteArray(),
             InetSocketAddress(hostname, port),
             5000
         )
