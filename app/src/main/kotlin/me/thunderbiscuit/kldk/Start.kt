@@ -122,7 +122,7 @@ object KldkFeeEstimator : FeeEstimator.FeeEstimatorInterface {
 // which has 1 function: log(record: Record?): Unit
 object KldkLogger : Logger.LoggerInterface {
     override fun log(record: Record?) {
-        println("$record")
+        println("Log entry: ${record?.get_args().toString()}")
     }
 }
 
