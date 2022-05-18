@@ -5,15 +5,16 @@ import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.network.sockets.*
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.batteries.NioPeerHandler
 import org.ldk.enums.ConfirmationTarget
 import org.ldk.enums.Network
 import org.ldk.structs.*
 import java.io.File
-import javax.annotation.Nullable
 
 var nioPeerHandler: NioPeerHandler? = null
+var peerManager: PeerManager? = null
 
 // the startNode function fires up the basic things we need for the node to operate
 fun startNode() {
@@ -101,6 +102,7 @@ fun startNode() {
         // remove non-null assertion operator once the else branch of the variable declaration above is completed
         val channelManager: ChannelManager = channelManagerConstructor!!.channel_manager
         nioPeerHandler = channelManagerConstructor.nio_peer_handler
+        peerManager = channelManagerConstructor.peer_manager
 
     } catch (e: Throwable) {
         println("Kldk startup error: $e")
