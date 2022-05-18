@@ -29,7 +29,7 @@ fun startNode() {
     // val network: Network = Network.LDKNetwork_Testnet
     val network: Network = if (Config.network == "regtest") Network.LDKNetwork_Regtest else Network.LDKNetwork_Testnet
     // val genesisHash = "000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"
-    val networkGraph = NetworkGraph.of(Config.genesisHash.hexStringToByteArray().reversedArray())
+    val networkGraph = NetworkGraph.of(Config.genesisHash.toByteArray().reversedArray())
 
     val persister: Persist = Persist.new_impl(KldkPersister)
 
@@ -49,7 +49,7 @@ fun startNode() {
 
     val channelMonitorsList: ArrayList<ByteArray> = arrayListOf<ByteArray>()
     serializedChannelMonitorsList.forEach {
-        val channelMonitorBytes: ByteArray = it.hexStringToByteArray()
+        val channelMonitorBytes: ByteArray = it.toByteArray()
         channelMonitorsList.add(channelMonitorBytes)
     }
     val channelMonitors: Array<ByteArray> = channelMonitorsList.toTypedArray()
@@ -70,7 +70,7 @@ fun startNode() {
 
     val entropy: String = Config.entropy
     val keysManager: KeysManager = KeysManager.of(
-        entropy.hexStringToByteArray(),
+        entropy.toByteArray(),
         System.currentTimeMillis() / 1000,
         (System.currentTimeMillis() * 1000).toInt()
     )
@@ -82,7 +82,7 @@ fun startNode() {
                         network,
                         // userConfig,
                         UserConfig.with_default(),
-                        Config.latestBlockHash.hexStringToByteArray(),
+                        Config.latestBlockHash.toByteArray(),
                         Config.latestBlockHeight,
                         keysManager.as_KeysInterface(),
                         feeEstimator,
@@ -138,8 +138,8 @@ object KldkPersister : Persist.PersistInterface {
     ): Result_NoneChannelMonitorUpdateErrZ? {
         if (channel_id == null || data == null) return null
         val channelMonitorBytes: ByteArray = data.write()
-        File("${Config.homeDir}/channel_monitor_${byteArrayToHex(channel_id.to_channel_id())}.hex")
-            .writeText(byteArrayToHex(channelMonitorBytes))
+        File("${Config.homeDir}/channelmonitor${channel_id.to_channel_id().toHex()}.hex")
+            .writeText(channelMonitorBytes.toHex())
         return Result_NoneChannelMonitorUpdateErrZ.ok()
     }
 
@@ -151,8 +151,8 @@ object KldkPersister : Persist.PersistInterface {
     ): Result_NoneChannelMonitorUpdateErrZ? {
         if (channel_id == null || data == null) return null
         val channelMonitorBytes: ByteArray = data.write()
-        File("${Config.homeDir}/channelmonitor${byteArrayToHex(channel_id.to_channel_id())}.hex")
-            .writeText(byteArrayToHex(channelMonitorBytes))
+        File("${Config.homeDir}/channelmonitor${channel_id.to_channel_id().toHex()}.hex")
+            .writeText(channelMonitorBytes.toHex())
         return Result_NoneChannelMonitorUpdateErrZ.ok()
     }
 }
@@ -170,9 +170,9 @@ object KldkEventHandler : ChannelManagerConstructor.EventHandler {
     override fun persist_manager(channel_manager_bytes: ByteArray?) {
         println("Persist manager")
         if (channel_manager_bytes != null) {
-            val hex = byteArrayToHex(channel_manager_bytes)
+            val hex = channel_manager_bytes.toHex()
             println("Channel manager bytes: $hex")
-            File("${Config.homeDir}/channelmanager").writeText(byteArrayToHex(channel_manager_bytes))
+            File("${Config.homeDir}/channelmanager").writeText(channel_manager_bytes.toHex())
         }
     }
 
