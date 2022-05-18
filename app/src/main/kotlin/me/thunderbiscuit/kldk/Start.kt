@@ -81,8 +81,7 @@ fun startNode() {
             // first time booting up the node
             null -> ChannelManagerConstructor(
                         network,
-                        // userConfig,
-                        UserConfig.with_default(),
+                        userConfig,
                         Config.latestBlockHash.toByteArray(),
                         Config.latestBlockHeight,
                         keysManager.as_KeysInterface(),
@@ -100,7 +99,7 @@ fun startNode() {
         }
 
         // remove non-null assertion operator once the else branch of the variable declaration above is completed
-        val channelManager: ChannelManager = channelManagerConstructor!!.channel_manager
+        val channelManager: ChannelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
         nioPeerHandler = channelManagerConstructor.nio_peer_handler
         peerManager = channelManagerConstructor.peer_manager
 
@@ -199,11 +198,11 @@ object KldkFilter : Filter.FilterInterface {
 suspend fun getLatestBlockHash(): String {
     val client = HttpClient(CIO)
     val response: HttpResponse = client.get("https://blockstream.info/testnet/api/blocks/tip/hash")
-    return response.body<String>()
+    return response.body()
 }
 
 suspend fun getLatestBlockHeight(): Int {
     val client = HttpClient(CIO)
     val response: HttpResponse = client.get("https://blockstream.info/testnet/api/blocks/tip/height")
-    return response.body<Int>()
+    return response.body()
 }
