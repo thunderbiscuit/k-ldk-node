@@ -100,13 +100,13 @@ class ListPeers : CliktCommand(name = "listpeers", help = "Print a list of conne
 class OpenChannel : CliktCommand(name = "openchannel", help = "Open a channel to a peer") {
     private val pubkey by option("--pubkey", help="Peer public key (required)").required()
     private val channelValue by option("--channelvalue", help="Channel value in millisatoshi (required)").required()
-    private val pushAmount by option("--pushamount", help="The amount to push to the counterparty as part of the open, in millisatoshi").required()
+    private val pushAmount by option("--pushamount", help="Amount to push to the counterparty as part of the open, in millisatoshi (required)").required()
 
     override fun run() {
         val response = createChannel(pubkey.toByteArray(), channelValue.toLong(), pushAmount.toLong(), 4242)
         when (response) {
-            is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> println(response.res)
-            is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> println(response.err.toString())
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> echo(response.res.toString())
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> echo(response.err.toString())
         }
     }
 }

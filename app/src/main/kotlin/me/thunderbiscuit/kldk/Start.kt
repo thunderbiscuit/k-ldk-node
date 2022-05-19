@@ -55,10 +55,10 @@ fun startNode() {
 
     val userConfig: UserConfig = UserConfig.with_default()
 
-    val transactionFilter: Option_FilterZ? = null
+    // val transactionFilter: Option_FilterZ? = null
     // val filter: Option_FilterZ = Option_FilterZ.some(txFilter)
-    // val txFilter: Filter = Filter.new_impl(KldkTransactionFilter)
-    // val transactionFilter = Option_FilterZ.some(txFilter)
+    val txFilter: Filter = Filter.new_impl(KldkTransactionFilter)
+    val transactionFilter = Option_FilterZ.some(txFilter)
     val chainMonitor: ChainMonitor = ChainMonitor.of(
         transactionFilter,
         transactionBroadcaster,
