@@ -10,10 +10,13 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
 import kotlinx.coroutines.runBlocking
 import me.thunderbiscuit.kldk.network.connectPeer
+import me.thunderbiscuit.kldk.network.createChannel
 import me.thunderbiscuit.kldk.network.getLatestBlockHash
 import me.thunderbiscuit.kldk.network.getLatestBlockHeight
 import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.listPeers
+import me.thunderbiscuit.kldk.utils.toByteArray
+import org.ldk.structs.Result__u832APIErrorZ
 import kotlin.system.exitProcess
 
 fun main() {
@@ -30,6 +33,7 @@ fun main() {
                     ConnectToPeer(),
                     ListPeers(),
                     GetBlockInfo(),
+                    OpenChannel(),
                     Shutdown(),
                     Exit()
                 )
@@ -41,8 +45,7 @@ fun main() {
         } catch (e: UsageError) {
             echo(e.helpMessage())
             println()
-        }
-        catch (e: Throwable) {
+        } catch (e: Throwable) {
             println("ERROR: ${e.printStackTrace()}")
             println()
         }
@@ -90,6 +93,20 @@ class ListPeers : CliktCommand(name = "listpeers", help = "Print a list of conne
             else -> peers.forEachIndexed { index, peerPubkey ->
                 echo("Peer ${index + 1}: $peerPubkey")
             }
+        }
+    }
+}
+
+class OpenChannel : CliktCommand(name = "openchannel", help = "Open a channel to a peer") {
+    private val pubkey by option("--pubkey", help="Peer public key (required)").required()
+    private val channelValue by option("--channelvalue", help="Channel value in millisatoshi (required)").required()
+    private val pushAmount by option("--pushamount", help="The amount to push to the counterparty as part of the open, in millisatoshi").required()
+
+    override fun run() {
+        val response = createChannel(pubkey.toByteArray(), channelValue.toLong(), pushAmount.toLong(), 4242)
+        when (response) {
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> println(response.res)
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> println(response.err.toString())
         }
     }
 }

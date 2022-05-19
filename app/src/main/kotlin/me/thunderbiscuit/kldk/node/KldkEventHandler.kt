@@ -7,12 +7,15 @@ import org.ldk.structs.Event
 import java.io.File
 
 object KldkEventHandler : ChannelManagerConstructor.EventHandler {
-    override fun handle_event(events: Event?) {
-        when (events) {
-            is Event.FundingGenerationReady -> println("We just had a FundingGenerationReady event")
+    override fun handle_event(event: Event?) {
+        when (event) {
+            is Event.FundingGenerationReady -> {
+                println("We just had a FundingGenerationReady event")
+                println(event.output_script)
+            }
             is Event.ChannelClosed          -> println("We just had a ChannelClosed event")
             is Event.DiscardFunding         -> println("We just had a DiscardFunding event")
-            else                            -> println("We just had a $events event")
+            else                            -> println("We just had a $event event")
         }
     }
 

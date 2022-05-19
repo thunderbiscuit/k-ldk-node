@@ -10,4 +10,3 @@ Start the REPL:
 ```shell
 cd ./app/build/install/kldk/bin/
 ./kldk
-```

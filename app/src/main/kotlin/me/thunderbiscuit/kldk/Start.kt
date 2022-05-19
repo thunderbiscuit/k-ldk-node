@@ -9,8 +9,9 @@ import org.ldk.enums.Network
 import org.ldk.structs.*
 import java.io.File
 
-var nioPeerHandler: NioPeerHandler? = null
+var peerHandler: NioPeerHandler? = null
 var peerManager: PeerManager? = null
+var channelManager: ChannelManager? = null
 
 fun startNode() {
 
@@ -54,10 +55,10 @@ fun startNode() {
 
     val userConfig: UserConfig = UserConfig.with_default()
 
-    // val filter: Option_FilterZ? = null
+    val transactionFilter: Option_FilterZ? = null
     // val filter: Option_FilterZ = Option_FilterZ.some(txFilter)
-    val txFilter: Filter = Filter.new_impl(KldkTransactionFilter)
-    val transactionFilter = Option_FilterZ.some(txFilter)
+    // val txFilter: Filter = Filter.new_impl(KldkTransactionFilter)
+    // val transactionFilter = Option_FilterZ.some(txFilter)
     val chainMonitor: ChainMonitor = ChainMonitor.of(
         transactionFilter,
         transactionBroadcaster,
@@ -95,8 +96,8 @@ fun startNode() {
             }
         }
 
-        val channelManager: ChannelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
-        nioPeerHandler = channelManagerConstructor.nio_peer_handler
+        channelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
+        peerHandler = channelManagerConstructor.nio_peer_handler
         peerManager = channelManagerConstructor.peer_manager
 
     } catch (e: Throwable) {
