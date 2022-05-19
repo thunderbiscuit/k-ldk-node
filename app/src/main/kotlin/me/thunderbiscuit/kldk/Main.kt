@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import me.thunderbiscuit.kldk.network.connectPeer
 import me.thunderbiscuit.kldk.network.getLatestBlockHash
 import me.thunderbiscuit.kldk.network.getLatestBlockHeight
+import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.listPeers
 import kotlin.system.exitProcess
 

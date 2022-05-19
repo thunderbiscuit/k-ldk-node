@@ -1,4 +1,4 @@
-package me.thunderbiscuit.kldk
+package me.thunderbiscuit.kldk.utils
 
 import com.typesafe.config.ConfigFactory
 

@@ -1,6 +1,7 @@
 package me.thunderbiscuit.kldk
 
 import me.thunderbiscuit.kldk.node.*
+import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.toByteArray
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.batteries.NioPeerHandler
@@ -11,17 +12,20 @@ import java.io.File
 var nioPeerHandler: NioPeerHandler? = null
 var peerManager: PeerManager? = null
 
-// the startNode function fires up the basic things we need for the node to operate
 fun startNode() {
 
     val feeEstimator: FeeEstimator = FeeEstimator.new_impl(KldkFeeEstimator)
-    // the other way to provide the interface is using Kotlin SAM conversion
+    // The other way to provide the interface is by using Kotlin SAM conversion
+    // See the docs here: https://kotlinlang.org/docs/fun-interfaces.html
+    // Using Kotlin SAM conversion, you could initialize your feeEstimator like so:
+    // val feeEstimator: FeeEstimator = FeeEstimator.new_impl {
+    //     return@new_impl 25_000
+    // }
 
     val logger: Logger = Logger.new_impl(KldkLogger)
 
     val transactionBroadcaster: BroadcasterInterface = BroadcasterInterface.new_impl(KldkBroadcaster)
 
-    // val network: Network = Network.LDKNetwork_Testnet
     val network: Network = if (Config.network == "regtest") Network.LDKNetwork_Regtest else Network.LDKNetwork_Testnet
     val networkGraph = NetworkGraph.of((Config.genesisHash.toByteArray()).reversedArray())
 
@@ -91,7 +95,6 @@ fun startNode() {
             }
         }
 
-        // remove non-null assertion operator once the else branch of the variable declaration above is completed
         val channelManager: ChannelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
         nioPeerHandler = channelManagerConstructor.nio_peer_handler
         peerManager = channelManagerConstructor.peer_manager

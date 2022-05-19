@@ -1,6 +1,6 @@
 package me.thunderbiscuit.kldk.node
 
-import me.thunderbiscuit.kldk.Config
+import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.toHex
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.structs.Event
