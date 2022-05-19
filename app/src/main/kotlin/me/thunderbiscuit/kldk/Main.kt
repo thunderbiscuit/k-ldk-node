@@ -10,6 +10,8 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
 import kotlinx.coroutines.runBlocking
 import me.thunderbiscuit.kldk.network.connectPeer
+import me.thunderbiscuit.kldk.network.getLatestBlockHash
+import me.thunderbiscuit.kldk.network.getLatestBlockHeight
 import me.thunderbiscuit.kldk.utils.listPeers
 import kotlin.system.exitProcess
 
@@ -26,7 +28,7 @@ fun main() {
                     StartNode(),
                     ConnectToPeer(),
                     ListPeers(),
-                    TestCommand(),
+                    GetBlockInfo(),
                     Shutdown(),
                     Exit()
                 )
@@ -48,9 +50,9 @@ fun main() {
 
 class Kldk : CliktCommand() {
     override val commandHelp = """
-        Kldk is a lightning node.
+        Kldk is a lightning node ⚡.
 
-        Call any of the commands to interact with it.
+        Use any of the commands to interact with it.
     """
 
     override fun run() = Unit
@@ -58,14 +60,17 @@ class Kldk : CliktCommand() {
 
 class StartNode : CliktCommand(help = "Start your Kldk node", name = "startnode") {
     override fun run() {
+        echo("Kldk starting...")
         startNode()
+        echo("Up and running!")
     }
 }
 
-class ConnectToPeer : CliktCommand(help = "Connect to a peer", name = "connectpeer") {
+class ConnectToPeer : CliktCommand(name = "connectpeer", help = "Connect to a peer") {
     private val pubkey by option("--pubkey", help="Peer public key (required)").required()
     private val ip by option("--ip", help="Peer ip address (required)").required()
     private val port by option("--port", help="Peer port (required)").int().required()
+
     override fun run() {
         echo("Kldk attempting to connect to peer $pubkey@$ip:$port...")
         connectPeer(
@@ -76,15 +81,19 @@ class ConnectToPeer : CliktCommand(help = "Connect to a peer", name = "connectpe
     }
 }
 
-class ListPeers : CliktCommand(name = "listpeers") {
+class ListPeers : CliktCommand(name = "listpeers", help = "Print a list of connected peers") {
     override fun run() {
-        listPeers().forEachIndexed { index, peerPubkey ->
-            echo("Peer ${index + 1}: $peerPubkey")
+        val peers: List<String> = listPeers()
+        when {
+            peers.isEmpty() -> echo("No connected peers at the moment")
+            else -> peers.forEachIndexed { index, peerPubkey ->
+                echo("Peer ${index + 1}: $peerPubkey")
+            }
         }
     }
 }
 
-class TestCommand : CliktCommand(name = "testcommand") {
+class GetBlockInfo : CliktCommand(name = "getblockinfo", help = "Print latest block height and hash") {
     override fun run() {
         runBlocking {
             val latestBlockHash = getLatestBlockHash()
@@ -95,13 +104,13 @@ class TestCommand : CliktCommand(name = "testcommand") {
     }
 }
 
-class Shutdown : CliktCommand(help = "Shutdown node") {
+class Shutdown : CliktCommand(name = "shutdown", help = "Shutdown node") {
     override fun run() {
         echo("Shutting down node...")
     }
 }
 
-class Exit : CliktCommand(help = "Exit REPL") {
+class Exit : CliktCommand(name = "exit", help = "Exit REPL") {
     override fun run() {
         echo("Exiting the REPL...")
         exitProcess(0)
