@@ -18,9 +18,14 @@ import me.thunderbiscuit.kldk.utils.listPeers
 import me.thunderbiscuit.kldk.utils.toByteArray
 import org.ldk.structs.Result__u832APIErrorZ
 import kotlin.system.exitProcess
+import com.github.ajalt.mordant.rendering.TextColors.*
+import com.github.ajalt.mordant.table.ColumnWidth
+import com.github.ajalt.mordant.table.table
+import com.github.ajalt.mordant.terminal.Terminal
+
 
 fun main() {
-    println("Hello, ${Config.nodeName}!\n")
+    println(green("Hello, ${Config.nodeName}!\n"))
 
     while (true) {
         print("Kldk ❯❯❯ ")
@@ -64,9 +69,9 @@ class Kldk : CliktCommand() {
 
 class StartNode : CliktCommand(help = "Start your Kldk node", name = "startnode") {
     override fun run() {
-        echo("Kldk starting...")
+        echo(green("Kldk starting..."))
         startNode()
-        echo("Up and running!")
+        echo(green("Up and running!"))
     }
 }
 
@@ -76,37 +81,52 @@ class ConnectToPeer : CliktCommand(name = "connectpeer", help = "Connect to a pe
     private val port by option("--port", help="Peer port (required)").int().required()
 
     override fun run() {
-        echo("Kldk attempting to connect to peer $pubkey@$ip:$port...")
-        connectPeer(
+        val peer: String = "$pubkey@$ip:$port"
+        echo(green("Kldk attempting to connect to peer ") + green(peer))
+        val message = connectPeer(
             pubkey = pubkey,
             hostname = ip,
             port = port
         )
+        echo(green(message))
     }
 }
 
 class ListPeers : CliktCommand(name = "listpeers", help = "Print a list of connected peers") {
+    private val terminal = Terminal()
+
     override fun run() {
         val peers: List<String> = listPeers()
         when {
-            peers.isEmpty() -> echo("No connected peers at the moment")
-            else -> peers.forEachIndexed { index, peerPubkey ->
-                echo("Peer ${index + 1}: $peerPubkey")
-            }
+            peers.isEmpty() -> echo(green("No connected peers at the moment"))
+            else -> terminal.println(
+                table {
+                    // borderStyle = gray
+                    column(1) {
+                        width = ColumnWidth.Expand()
+                    }
+                    header { row("Peer # ", "Node ID") }
+                    body {
+                        peers.forEachIndexed { index, peerPubkey ->
+                            row("Peer ${index + 1} ", white(peerPubkey))
+                        }
+                    }
+                }
+            )
         }
     }
 }
 
 class OpenChannel : CliktCommand(name = "openchannel", help = "Open a channel to a peer") {
     private val pubkey by option("--pubkey", help="Peer public key (required)").required()
-    private val channelValue by option("--channelvalue", help="Channel value in millisatoshi (required)").required()
-    private val pushAmount by option("--pushamount", help="Amount to push to the counterparty as part of the open, in millisatoshi (required)").required()
+    private val channelValue by option("--channelvalue", help="Channel value in millisatoshi (required)").int().required()
+    private val pushAmount by option("--pushamount", help="Amount to push to the counterparty as part of the open, in millisatoshi (required)").int().required()
 
     override fun run() {
         val response = createChannel(pubkey.toByteArray(), channelValue.toLong(), pushAmount.toLong(), 4242)
         when (response) {
-            is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> echo(response.res.toString())
-            is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> echo(response.err.toString())
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> echo("Response from channel open request: ${response.res}")
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> echo("Response from channel open request: ${response.err}")
         }
     }
 }
@@ -116,21 +136,21 @@ class GetBlockInfo : CliktCommand(name = "getblockinfo", help = "Print latest bl
         runBlocking {
             val latestBlockHash = getLatestBlockHash()
             val latestBlockHeight = getLatestBlockHeight()
-            echo("Latest block hash is $latestBlockHash")
-            echo("Latest block height is $latestBlockHeight")
+            echo(green("Latest block hash is $latestBlockHash"))
+            echo(green("Latest block height is $latestBlockHeight"))
         }
     }
 }
 
 class Shutdown : CliktCommand(name = "shutdown", help = "Shutdown node") {
     override fun run() {
-        echo("Shutting down node...")
+        echo(green("Shutting down node... (this has not been implemented yet)"))
     }
 }
 
 class Exit : CliktCommand(name = "exit", help = "Exit REPL") {
     override fun run() {
-        echo("Exiting the REPL...")
+        echo(green("Exiting the REPL..."))
         exitProcess(0)
     }
 }

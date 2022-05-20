@@ -16,6 +16,7 @@ dependencies {
 
     // clikt
     implementation("com.github.ajalt.clikt:clikt:3.4.0")
+    implementation("com.github.ajalt.mordant:mordant:2.0.0-beta6")
 
     // ktor
     implementation("io.ktor:ktor-client-core:2.0.1")
