@@ -1,0 +1,15 @@
+<configuration>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>kldk.log</file>
+        <append>true</append>
+        <encoder>
+            <!-- use this if you have multiple loggers and want to name them -->
+            <!-- <pattern>%d{YYYY-MM-dd HH:mm:ss} %-5level %logger{35} - %msg%n</pattern> -->
+            <pattern>%d{YYYY-MM-dd HH:mm:ss} %-5level - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>

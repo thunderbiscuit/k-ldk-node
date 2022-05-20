@@ -22,6 +22,10 @@ dependencies {
     implementation("io.ktor:ktor-client-core:2.0.1")
     implementation("io.ktor:ktor-client-cio:2.0.1")
 
+    // logging
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
+    implementation("ch.qos.logback:logback-classic:1.2.11")
+
     // lightningdevkit
     implementation("org.lightningdevkit:ldk-java:0.0.106.0")
 
