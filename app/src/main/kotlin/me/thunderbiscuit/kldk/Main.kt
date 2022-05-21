@@ -34,6 +34,7 @@ fun main() {
         try {
             Kldk()
                 .subcommands(
+                    Help(),
                     StartNode(),
                     ConnectToPeer(),
                     ListPeers(),
@@ -64,7 +65,18 @@ class Kldk : CliktCommand() {
         Use any of the commands to interact with it.
     """
 
+    override fun getFormattedHelp(): String {
+        val formattedHelp =  super.getFormattedHelp()
+        return green(formattedHelp)
+    }
+
     override fun run() = Unit
+}
+
+class Help : CliktCommand(name = "help", help = "Print help output") {
+    override fun run() {
+        echo(green(rootHelpMessage.trimMargin("|")))
+    }
 }
 
 class StartNode : CliktCommand(help = "Start your Kldk node", name = "startnode") {
@@ -154,3 +166,21 @@ class Exit : CliktCommand(name = "exit", help = "Exit REPL") {
         exitProcess(0)
     }
 }
+
+const val rootHelpMessage = """
+    |Usage: COMMAND [ARGS]...
+    |
+    |  Kldk is a lightning node ⚡.
+    |
+    |  Use any of the commands to interact with it.
+    |
+    |Commands:
+    |  help          Print the root help output
+    |  startnode     Start your Kldk node
+    |  connectpeer   Connect to a peer
+    |  listpeers     Print a list of connected peers
+    |  getblockinfo  Print latest block height and hash
+    |  openchannel   Open a channel to a peer
+    |  getnodeinfo   Print node information
+    |  shutdown      Shutdown node
+    |  exit          Exit REPL"""
