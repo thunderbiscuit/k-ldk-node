@@ -1,9 +1,6 @@
 package me.thunderbiscuit.kldk
 
-import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.PrintHelpMessage
-import com.github.ajalt.clikt.core.UsageError
-import com.github.ajalt.clikt.core.subcommands
+import com.github.ajalt.clikt.core.*
 import com.github.ajalt.clikt.output.TermUi.echo
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
@@ -38,8 +35,9 @@ fun main() {
                     StartNode(),
                     ConnectToPeer(),
                     ListPeers(),
-                    GetBlockInfo(),
                     OpenChannel(),
+                    GetBlockInfo(),
+                    GetNodeInfo(),
                     Shutdown(),
                     Exit()
                 )
@@ -151,6 +149,12 @@ class GetBlockInfo : CliktCommand(name = "getblockinfo", help = "Print latest bl
             echo(green("Latest block hash is $latestBlockHash"))
             echo(green("Latest block height is $latestBlockHeight"))
         }
+    }
+}
+
+class GetNodeInfo : CliktCommand(name = "getnodeinfo", help = "Print node information") {
+    override fun run() {
+        echo(green("Network: ${Config.network.uppercase()}"))
     }
 }
 
