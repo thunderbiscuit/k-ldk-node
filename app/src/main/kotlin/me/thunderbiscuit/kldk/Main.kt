@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.output.TermUi.echo
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
+import com.github.ajalt.mordant.rendering.OverflowWrap
 import kotlinx.coroutines.runBlocking
 import me.thunderbiscuit.kldk.network.connectPeer
 import me.thunderbiscuit.kldk.network.createChannel
@@ -19,6 +20,7 @@ import com.github.ajalt.mordant.rendering.TextColors.*
 import com.github.ajalt.mordant.table.ColumnWidth
 import com.github.ajalt.mordant.table.table
 import com.github.ajalt.mordant.terminal.Terminal
+import me.thunderbiscuit.kldk.utils.getNodeId
 
 
 fun main() {
@@ -58,7 +60,7 @@ fun main() {
 
 class Kldk : CliktCommand() {
     override val commandHelp = """
-        Kldk is a lightning node ⚡.
+        Kldk is a bitcoin lightning node ⚡.
 
         Use any of the commands to interact with it.
     """
@@ -153,8 +155,24 @@ class GetBlockInfo : CliktCommand(name = "getblockinfo", help = "Print latest bl
 }
 
 class GetNodeInfo : CliktCommand(name = "getnodeinfo", help = "Print node information") {
+    private val terminal: Terminal = Terminal()
+    val nodeId: String = getNodeId()
+    private val status: String = if (peerManager != null) green("⬤  Up and running") else red("⬤  Node is down")
+
     override fun run() {
-        echo(green("Network: ${Config.network.uppercase()}"))
+        terminal.println(
+            table {
+                column(1) {
+                    overflowWrap = OverflowWrap.NORMAL
+                }
+                // header { row("Data", "Info") }
+                body {
+                    row("Node Status", status)
+                    row("Network", Config.network.replaceFirstChar { it.uppercase() })
+                    row("Node ID", nodeId)
+                }
+            }
+        )
     }
 }
 

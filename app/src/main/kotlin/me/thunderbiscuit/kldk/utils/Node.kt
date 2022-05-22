@@ -1,5 +1,6 @@
 package me.thunderbiscuit.kldk.utils
 
+import me.thunderbiscuit.kldk.channelManager
 import me.thunderbiscuit.kldk.peerManager
 
 fun listPeers(): List<String> {
@@ -8,4 +9,8 @@ fun listPeers(): List<String> {
         it.toHex()
     }
     return peersList
+}
+
+fun getNodeId(): String {
+    return channelManager?.get_our_node_id()?.toHex() ?: ""
 }
