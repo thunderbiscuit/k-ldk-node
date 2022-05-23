@@ -11,6 +11,8 @@ repositories {
 }
 
 dependencies {
+    implementation("com.google.guava:guava:31.1-jre")
+    
     // hocon
     implementation("com.typesafe:config:1.4.2")
 

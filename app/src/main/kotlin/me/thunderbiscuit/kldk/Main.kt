@@ -163,7 +163,7 @@ class GetNodeInfo : CliktCommand(name = "getnodeinfo", help = "Print node inform
         terminal.println(
             table {
                 column(1) {
-                    overflowWrap = OverflowWrap.NORMAL
+                    overflowWrap = OverflowWrap.BREAK_WORD
                 }
                 // header { row("Data", "Info") }
                 body {
