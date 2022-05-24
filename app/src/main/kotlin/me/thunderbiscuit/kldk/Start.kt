@@ -67,6 +67,8 @@ fun startNode() {
         persister
     )
 
+    val scorer: MultiThreadedLockableScore = MultiThreadedLockableScore.of(Scorer.with_default().as_Score())
+
     val entropy: String = Config.entropy
     val keysManager: KeysManager = KeysManager.of(
         entropy.toByteArray(),
@@ -97,6 +99,7 @@ fun startNode() {
         }
 
         channelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
+        channelManagerConstructor.chain_sync_completed(eventHandler, scorer)
         peerHandler = channelManagerConstructor.nio_peer_handler
         peerManager = channelManagerConstructor.peer_manager
 
