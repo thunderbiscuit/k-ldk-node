@@ -7,10 +7,6 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.mordant.rendering.OverflowWrap
 import kotlinx.coroutines.runBlocking
-import me.thunderbiscuit.kldk.network.connectPeer
-import me.thunderbiscuit.kldk.network.createChannel
-import me.thunderbiscuit.kldk.network.getLatestBlockHash
-import me.thunderbiscuit.kldk.network.getLatestBlockHeight
 import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.listPeers
 import me.thunderbiscuit.kldk.utils.toByteArray
@@ -20,6 +16,7 @@ import com.github.ajalt.mordant.rendering.TextColors.*
 import com.github.ajalt.mordant.table.ColumnWidth
 import com.github.ajalt.mordant.table.table
 import com.github.ajalt.mordant.terminal.Terminal
+import me.thunderbiscuit.kldk.network.*
 import me.thunderbiscuit.kldk.utils.getNodeId
 
 
@@ -37,7 +34,8 @@ fun main() {
                     StartNode(),
                     ConnectToPeer(),
                     ListPeers(),
-                    OpenChannel(),
+                    OpenChannelPart1(),
+                    OpenChannelPart2(),
                     GetBlockInfo(),
                     GetNodeInfo(),
                     Shutdown(),
@@ -115,7 +113,8 @@ class ListPeers : CliktCommand(name = "listpeers", help = "Print a list of conne
                 table {
                     // borderStyle = gray
                     column(1) {
-                        width = ColumnWidth.Expand()
+                        // width = ColumnWidth.Expand()
+                        overflowWrap = OverflowWrap.BREAK_WORD
                     }
                     header { row("Peer # ", "Node ID") }
                     body {
@@ -129,17 +128,26 @@ class ListPeers : CliktCommand(name = "listpeers", help = "Print a list of conne
     }
 }
 
-class OpenChannel : CliktCommand(name = "openchannel", help = "Open a channel to a peer") {
-    private val pubkey by option("--pubkey", help="Peer public key (required)").required()
-    private val channelValue by option("--channelvalue", help="Channel value in millisatoshi (required)").int().required()
-    private val pushAmount by option("--pushamount", help="Amount to push to the counterparty as part of the open, in millisatoshi (required)").int().required()
+class OpenChannelPart1 : CliktCommand(name = "openchannel1", help = "Open a channel part 1") {
+    private val pubkey by option("--pubkey", help = "Peer public key (required)").required()
+    private val channelValue by option("--channelvalue", help = "Channel value in millisatoshi (required)").int().required()
+    private val pushAmount by option("--pushamount", help = "Amount to push to the counterparty as part of the open, in millisatoshi (required)").int().required()
 
     override fun run() {
-        val response = createChannel(pubkey.toByteArray(), channelValue.toLong(), pushAmount.toLong(), 4242)
+        val response = createFundingTx(pubkey.toByteArray(), channelValue.toLong(), pushAmount.toLong(), 4242)
         when (response) {
-            is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> echo("Response from channel open request: ${response.res}")
-            is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> echo("Response from channel open request: ${response.err}")
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> echo("Response from channel open request was positive: ${response.res} ${response.is_ok()}")
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> echo("Response from channel open request was negative: ${response.err}")
         }
+    }
+}
+
+class OpenChannelPart2 : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
+    private val tx: String by option("--tx", help = "Signed transaction in hex format").required()
+    private val tempChannelId: String by option("--tempchannelID", help = "Temporary channel id").required()
+
+    override fun run() {
+        broadcastFundingTx(tempChannelId, tx)
     }
 }
 
@@ -202,7 +210,8 @@ const val rootHelpMessage = """
     |  connectpeer   Connect to a peer
     |  listpeers     Print a list of connected peers
     |  getblockinfo  Print latest block height and hash
-    |  openchannel   Open a channel to a peer
+    |  openchannel1  Negotiate the funding transaction with a peer
+    |  openchannel2  Broadcast the funding transaction
     |  getnodeinfo   Print node information
     |  shutdown      Shutdown node
     |  exit          Exit REPL"""
