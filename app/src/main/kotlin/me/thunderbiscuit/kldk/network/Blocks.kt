@@ -17,3 +17,10 @@ suspend fun getLatestBlockHeight(): Int {
     val response: HttpResponse = client.get("https://blockstream.info/testnet/api/blocks/tip/height")
     return response.body()
 }
+
+suspend fun getLatestBlockHeader(): ByteArray {
+    val client = HttpClient(CIO)
+    val blockHash: String = getLatestBlockHash()
+    val response: HttpResponse = client.get("https://blockstream.info/testnet/api/block/$blockHash/header")
+    return response.body<String>().toByteArray()
+}
