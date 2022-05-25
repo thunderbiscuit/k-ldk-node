@@ -33,8 +33,8 @@ fun createFundingTx(
 }
 
 fun broadcastFundingTx(
+    tempChannelId: String,
     fundingTx: String,
-    tempChannelId: String
 ): Result_NoneAPIErrorZ? {
     return channelManager?.funding_transaction_generated(tempChannelId.toByteArray(), fundingTx.toByteArray())
 }

@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.output.TermUi.echo
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.int
+import com.github.ajalt.clikt.parameters.types.long
 import com.github.ajalt.mordant.rendering.OverflowWrap
 import kotlinx.coroutines.runBlocking
 import me.thunderbiscuit.kldk.utils.Config
@@ -131,26 +132,33 @@ class ListPeers : CliktCommand(name = "listpeers", help = "Print a list of conne
 
 class OpenChannelPart1 : CliktCommand(name = "openchannel1", help = "Open a channel part 1") {
     private val pubkey by option("--pubkey", help = "Peer public key (required)").required()
-    private val channelValue by option("--channelvalue", help = "Channel value in millisatoshi (required)").int().required()
-    private val pushAmount by option("--pushamount", help = "Amount to push to the counterparty as part of the open, in millisatoshi (required)").int().required()
+    private val channelValue by option("--channelvalue", help = "Channel value in millisatoshi (required)").long().required()
+    private val pushAmount by option("--pushamount", help = "Amount to push to the counterparty as part of the open, in millisatoshi (required)").long().required()
+    private val userChannelId by option("--userchannelID", help = "User channel ID (required)").long().required()
 
     override fun run() {
-        val response = createFundingTx(pubkey.toByteArray(), channelValue.toLong(), pushAmount.toLong(), 4242)
+        val response = createFundingTx(
+            pubkey = pubkey.toByteArray(),
+            channelValue = channelValue,
+            pushAmount = pushAmount,
+            userChannelId = userChannelId
+        )
         when (response) {
-            is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> echo("Response from channel open request was positive: ${response.res} ${response.is_ok()}")
-            is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> echo("Response from channel open request was negative: ${response.err}")
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> echo("Channel open request was sent.")
+            is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> echo("Channel open request was not sent. Error is ${response.err}")
         }
     }
 }
 
 class OpenChannelPart2 : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
-    // private val tx: String by option("--tx1", help = "Signed transaction in hex format").required()
-    // private val filewithtx: String by option("--file", help = "File with tx").required()
     private val tempChannelId: String by option("--tempchannelID", help = "Temporary channel id").required()
 
     override fun run() {
         val tx: String = File("${Config.homeDir}/tx.txt").absoluteFile.readText(Charsets.UTF_8)
-        broadcastFundingTx(tempChannelId, tx)
+        broadcastFundingTx(
+            tempChannelId = tempChannelId,
+            fundingTx = tx
+        )
     }
 }
 

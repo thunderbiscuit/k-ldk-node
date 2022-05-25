@@ -107,12 +107,12 @@ fun startNode() {
         peerHandler = channelManagerConstructor.nio_peer_handler
         peerManager = channelManagerConstructor.peer_manager
 
-        val bestHeader: ByteArray = runBlocking {
-            getLatestBlockHeader()
-        }
-        val bestHeight: Int = runBlocking {
-            getLatestBlockHeight()
-        }
+        // val bestHeader: ByteArray = runBlocking {
+        //     getLatestBlockHeader()
+        // }
+        // val bestHeight: Int = runBlocking {
+        //     getLatestBlockHeight()
+        // }
         // channelManager.update_best_block(best_header, best_height)
         // channelManager.current_best_block()
         // channelManager.best_block_updated()

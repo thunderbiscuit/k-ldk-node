@@ -11,9 +11,10 @@ private val MuLogger = KotlinLogging.logger("BaseLogger")
 
 object KldkEventHandler : ChannelManagerConstructor.EventHandler {
     override fun handle_event(event: Event?) {
+        println("Root of event handler: ${event.toString()}")
         when (event) {
             is Event.FundingGenerationReady -> fundingGenerationReady(event)
-            is Event.ChannelClosed          -> println("We just had a ChannelClosed event")
+            is Event.ChannelClosed          -> channelClosedEvent(event)
             is Event.DiscardFunding         -> println("We just had a DiscardFunding event")
             else                            -> println("We just had a $event event")
         }
@@ -28,6 +29,16 @@ object KldkEventHandler : ChannelManagerConstructor.EventHandler {
     override fun persist_network_graph(network_graph: ByteArray?) {
         println("Implement network graph persistence")
     }
+}
+
+fun channelClosedEvent(event: Event.ChannelClosed) {
+    println("We just had a ChannelClosed event")
+    println("The event reason is: ${event.reason}")
+    println("The event channel ID is: ${event.channel_id}")
+
+    MuLogger.info { "We just had a ChannelClosed event" }
+    MuLogger.info { "The event reason is: ${event.reason}" }
+    MuLogger.info { "The event channel ID is: ${event.channel_id}" }
 }
 
 fun fundingGenerationReady(event: Event.FundingGenerationReady) {
