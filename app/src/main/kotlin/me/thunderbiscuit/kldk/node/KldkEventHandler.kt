@@ -1,11 +1,13 @@
 package me.thunderbiscuit.kldk.node
 
-import me.thunderbiscuit.kldk.channelManager
 import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.toHex
+import mu.KotlinLogging
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.structs.Event
 import java.io.File
+
+private val MuLogger = KotlinLogging.logger("BaseLogger")
 
 object KldkEventHandler : ChannelManagerConstructor.EventHandler {
     override fun handle_event(event: Event?) {
@@ -18,10 +20,7 @@ object KldkEventHandler : ChannelManagerConstructor.EventHandler {
     }
 
     override fun persist_manager(channel_manager_bytes: ByteArray?) {
-        println("Persist manager")
         if (channel_manager_bytes != null) {
-            val hex = channel_manager_bytes.toHex()
-            println("Channel manager bytes: $hex")
             File("${Config.homeDir}/channelmanager").writeText(channel_manager_bytes.toHex())
         }
     }
@@ -33,8 +32,11 @@ object KldkEventHandler : ChannelManagerConstructor.EventHandler {
 
 fun fundingGenerationReady(event: Event.FundingGenerationReady) {
     println("We just had a FundingGenerationReady event")
-    println(event.output_script)
-    println(event.channel_value_satoshis)
-    // transform outputscript into a signed raw transaction
-    // channelManager?.funding_transaction_generated(temporary_channel_id: ByteArray, funding_transaction: ByteArray)
+    println("The output script for the funding transaction is: ${event.output_script.toHex()}")
+    println("The channel value in satoshis for the funding transaction is: ${event.channel_value_satoshis}")
+    println("The temporary channel ID for the funding transaction is: ${event.temporary_channel_id.toHex()}")
+    MuLogger.info { "We just had a FundingGenerationReady event" }
+    MuLogger.info { "The output script for the funding transaction is: ${event.output_script.toHex()}" }
+    MuLogger.info { "The channel value in satoshis for the funding transaction is: ${event.channel_value_satoshis}" }
+    MuLogger.info { "The temporary channel ID for the funding transaction is: ${event.temporary_channel_id.toHex()}" }
 }

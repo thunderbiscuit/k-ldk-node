@@ -1,5 +1,8 @@
 package me.thunderbiscuit.kldk
 
+import kotlinx.coroutines.runBlocking
+import me.thunderbiscuit.kldk.network.getLatestBlockHeader
+import me.thunderbiscuit.kldk.network.getLatestBlockHeight
 import me.thunderbiscuit.kldk.node.*
 import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.toByteArray
@@ -103,6 +106,18 @@ fun startNode() {
         peerHandler = channelManagerConstructor.nio_peer_handler
         peerManager = channelManagerConstructor.peer_manager
 
+        val bestHeader: ByteArray = runBlocking {
+            getLatestBlockHeader()
+        }
+        val bestHeight: Int = runBlocking {
+            getLatestBlockHeight()
+        }
+        // channelManager.update_best_block(best_header, best_height)
+        // channelManager.current_best_block()
+        // channelManager.best_block_updated()
+        // chainMonitor.update_best_block(best_header, best_height)
+        // chainMonitor.best_block_updated()
+        // channelManager.as_Confirm()
     } catch (e: Throwable) {
         println("Kldk startup error: $e")
     }

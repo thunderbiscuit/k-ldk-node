@@ -18,6 +18,7 @@ import com.github.ajalt.mordant.table.table
 import com.github.ajalt.mordant.terminal.Terminal
 import me.thunderbiscuit.kldk.network.*
 import me.thunderbiscuit.kldk.utils.getNodeId
+import java.io.File
 
 
 fun main() {
@@ -143,10 +144,12 @@ class OpenChannelPart1 : CliktCommand(name = "openchannel1", help = "Open a chan
 }
 
 class OpenChannelPart2 : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
-    private val tx: String by option("--tx", help = "Signed transaction in hex format").required()
+    // private val tx: String by option("--tx1", help = "Signed transaction in hex format").required()
+    // private val filewithtx: String by option("--file", help = "File with tx").required()
     private val tempChannelId: String by option("--tempchannelID", help = "Temporary channel id").required()
 
     override fun run() {
+        val tx: String = File("${Config.homeDir}/tx.txt").absoluteFile.readText(Charsets.UTF_8)
         broadcastFundingTx(tempChannelId, tx)
     }
 }
