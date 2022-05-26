@@ -98,7 +98,7 @@ fun startNode() {
             // loading previous state from disk
             else -> {
                 println("Node is not on its first boot")
-                null
+                throw(IllegalStateException("Reboot currently not supported"))
             }
         }
 
