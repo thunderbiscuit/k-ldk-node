@@ -57,7 +57,7 @@ fun main() {
             Kldk()
                 .subcommands(
                     Help(),
-                    StartNode(Node),
+                    StartNode(),
                     ConnectToPeer(),
                     ListPeers(),
                     OpenChannelPart1(),
@@ -103,7 +103,7 @@ class Help : CliktCommand(name = "help", help = "Print help output") {
     }
 }
 
-class StartNode(Node: Node) : CliktCommand(help = "Start your Kldk node", name = "startnode") {
+class StartNode() : CliktCommand(help = "Start your Kldk node", name = "startnode") {
     override fun run() {
         echo(green("Kldk starting..."))
         startNode(Node)
