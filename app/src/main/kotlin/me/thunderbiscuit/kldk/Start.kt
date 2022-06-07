@@ -9,14 +9,15 @@ import org.ldk.batteries.NioPeerHandler
 import org.ldk.enums.Network
 import org.ldk.structs.*
 import java.io.File
+import java.nio.channels.Channel
 
 // private val MuLogger = KotlinLogging.logger("BaseLogger")
 
-class Node(
-    val peerHandler: NioPeerHandler,
-    val peerManager: PeerManager,
-    val channelManager: ChannelManager,
-)
+// class Node(
+//     val peerHandler: NioPeerHandler,
+//     val peerManager: PeerManager,
+//     val channelManager: ChannelManager,
+// )
 // {
     // fun finalize() {
     //     println("Node is being garbage collected!")
@@ -30,7 +31,27 @@ class Node(
     // }
 // }
 
-fun startNode(): Node {
+data class CoreNodeElements(
+    val peerHandler: NioPeerHandler,
+    val peerManager: PeerManager,
+    val channelManager: ChannelManager
+)
+
+object Node {
+    val peerHandler: NioPeerHandler
+    val peerManager: PeerManager
+    val channelManager: ChannelManager
+
+    init {
+        val coreNodeElements: CoreNodeElements = startNode()
+        // peerHandler, peerManager, channelManager = startNode() // doesn't work
+        peerHandler = coreNodeElements.peerHandler
+        peerManager = coreNodeElements.peerManager
+        channelManager = coreNodeElements.channelManager
+    }
+}
+
+fun startNode(): CoreNodeElements {
 
     val feeEstimator: FeeEstimator = FeeEstimator.new_impl(KldkFeeEstimator)
     // The other way to provide the interface is by using Kotlin SAM conversion
@@ -134,7 +155,7 @@ fun startNode(): Node {
         // chainMonitor.best_block_updated()
         // channelManager.as_Confirm()
 
-        Node(peerHandler, peerManager, channelManager)
+        CoreNodeElements(peerHandler, peerManager, channelManager)
     } catch (e: Throwable) {
         println("Kldk startup error: $e")
         throw e

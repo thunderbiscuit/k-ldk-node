@@ -22,7 +22,7 @@ import java.io.File
 
 fun main() {
     println(green("Kldk starting..."))
-    val node: Node = startNode()
+    val node: Node = Node
     println(green("Up and running!\n"))
 
     while (true) {
