@@ -14,16 +14,40 @@ import me.thunderbiscuit.kldk.utils.toByteArray
 import org.ldk.structs.Result__u832APIErrorZ
 import kotlin.system.exitProcess
 import com.github.ajalt.mordant.rendering.TextColors.*
-import com.github.ajalt.mordant.table.ColumnWidth
 import com.github.ajalt.mordant.table.table
 import com.github.ajalt.mordant.terminal.Terminal
 import me.thunderbiscuit.kldk.network.*
 import me.thunderbiscuit.kldk.utils.getNodeId
+import mu.KotlinLogging
+import org.ldk.batteries.NioPeerHandler
+import org.ldk.structs.ChannelManager
+import org.ldk.structs.PeerManager
 import java.io.File
 
+private val MuLogger = KotlinLogging.logger("BaseLogger")
+
+object Node {
+
+    var peerHandler: NioPeerHandler? = null
+    var peerManager: PeerManager? = null
+    var channelManager: ChannelManager? = null
+
+    // fun finalize() {
+    //     println("Node object has been garbage collected!")
+    //     MuLogger.info {
+    //         """
+    //             #############################
+    //             Node object has been garbage collected!
+    //             #############################
+    //         """
+    //     }
+    // }
+}
 
 fun main() {
     println(green("Hello, ${Config.nodeName}!\n"))
+
+    val Node = Node
 
     while (true) {
         print("Kldk ❯❯❯ ")
@@ -33,7 +57,7 @@ fun main() {
             Kldk()
                 .subcommands(
                     Help(),
-                    StartNode(),
+                    StartNode(Node),
                     ConnectToPeer(),
                     ListPeers(),
                     OpenChannelPart1(),
@@ -79,10 +103,11 @@ class Help : CliktCommand(name = "help", help = "Print help output") {
     }
 }
 
-class StartNode : CliktCommand(help = "Start your Kldk node", name = "startnode") {
+class StartNode(Node: Node) : CliktCommand(help = "Start your Kldk node", name = "startnode") {
     override fun run() {
         echo(green("Kldk starting..."))
-        startNode()
+        startNode(Node)
+        // startNode(peerHandler, peerManager, channelManager)
         echo(green("Up and running!"))
     }
 }
@@ -175,8 +200,8 @@ class GetBlockInfo : CliktCommand(name = "getblockinfo", help = "Print latest bl
 
 class GetNodeInfo : CliktCommand(name = "getnodeinfo", help = "Print node information") {
     private val terminal: Terminal = Terminal()
-    val nodeId: String = getNodeId()
-    private val status: String = if (peerManager != null) green("⬤  Up and running") else red("⬤  Node is down")
+    private val nodeId: String = getNodeId()
+    private val status: String = if (Node.peerManager != null) green("⬤  Up and running") else red("⬤  Node is down")
 
     override fun run() {
         terminal.println(

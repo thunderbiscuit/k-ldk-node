@@ -1,22 +1,14 @@
 package me.thunderbiscuit.kldk
 
-import kotlinx.coroutines.runBlocking
-import me.thunderbiscuit.kldk.network.getLatestBlockHeader
-import me.thunderbiscuit.kldk.network.getLatestBlockHeight
 import me.thunderbiscuit.kldk.node.*
 import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.toByteArray
 import org.ldk.batteries.ChannelManagerConstructor
-import org.ldk.batteries.NioPeerHandler
 import org.ldk.enums.Network
 import org.ldk.structs.*
 import java.io.File
 
-var peerHandler: NioPeerHandler? = null
-var peerManager: PeerManager? = null
-var channelManager: ChannelManager? = null
-
-fun startNode() {
+fun startNode(Node: Node) {
 
     val feeEstimator: FeeEstimator = FeeEstimator.new_impl(KldkFeeEstimator)
     // The other way to provide the interface is by using Kotlin SAM conversion
@@ -102,10 +94,10 @@ fun startNode() {
             }
         }
 
-        channelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
+        Node.channelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
         channelManagerConstructor.chain_sync_completed(eventHandler, scorer)
-        peerHandler = channelManagerConstructor.nio_peer_handler
-        peerManager = channelManagerConstructor.peer_manager
+        Node.peerHandler = channelManagerConstructor.nio_peer_handler
+        Node.peerManager = channelManagerConstructor.peer_manager
 
         // val bestHeader: ByteArray = runBlocking {
         //     getLatestBlockHeader()
