@@ -33,12 +33,12 @@ fun main() {
             Kldk()
                 .subcommands(
                     Help(),
-                    ConnectToPeer(node),
-                    ListPeers(node),
-                    OpenChannelPart1(node),
-                    OpenChannelPart2(node),
+                    ConnectToPeer(),
+                    ListPeers(),
+                    OpenChannelPart1(),
+                    OpenChannelPart2(),
                     GetBlockInfo(),
-                    GetNodeInfo(node),
+                    GetNodeInfo(),
                     Shutdown(),
                     Exit()
                 )
@@ -78,7 +78,7 @@ class Help : CliktCommand(name = "help", help = "Print help output") {
     }
 }
 
-class ConnectToPeer(val node: Node) : CliktCommand(name = "connectpeer", help = "Connect to a peer") {
+class ConnectToPeer() : CliktCommand(name = "connectpeer", help = "Connect to a peer") {
     private val pubkey by option("--pubkey", help="Peer public key (required)").required()
     private val ip by option("--ip", help="Peer ip address (required)").required()
     private val port by option("--port", help="Peer port (required)").int().required()
@@ -87,7 +87,6 @@ class ConnectToPeer(val node: Node) : CliktCommand(name = "connectpeer", help = 
         val peer: String = "$pubkey@$ip:$port"
         echo(green("Kldk attempting to connect to peer ") + green(peer))
         val message = connectPeer(
-            node = node,
             pubkey = pubkey,
             hostname = ip,
             port = port
@@ -96,11 +95,11 @@ class ConnectToPeer(val node: Node) : CliktCommand(name = "connectpeer", help = 
     }
 }
 
-class ListPeers(val node: Node) : CliktCommand(name = "listpeers", help = "Print a list of connected peers") {
+class ListPeers() : CliktCommand(name = "listpeers", help = "Print a list of connected peers") {
     private val terminal = Terminal()
 
     override fun run() {
-        val peers: List<String> = listPeers(node = node)
+        val peers: List<String> = listPeers()
         when {
             peers.isEmpty() -> echo(green("No connected peers at the moment"))
             else -> terminal.println(
@@ -122,7 +121,7 @@ class ListPeers(val node: Node) : CliktCommand(name = "listpeers", help = "Print
     }
 }
 
-class OpenChannelPart1(val node: Node) : CliktCommand(name = "openchannel1", help = "Open a channel part 1") {
+class OpenChannelPart1() : CliktCommand(name = "openchannel1", help = "Open a channel part 1") {
     private val pubkey by option("--pubkey", help = "Peer public key (required)").required()
     private val channelValue by option("--channelvalue", help = "Channel value in millisatoshi (required)").long().required()
     private val pushAmount by option("--pushamount", help = "Amount to push to the counterparty as part of the open, in millisatoshi (required)").long().required()
@@ -130,7 +129,6 @@ class OpenChannelPart1(val node: Node) : CliktCommand(name = "openchannel1", hel
 
     override fun run() {
         val response = createFundingTx(
-            node = node,
             pubkey = pubkey.toByteArray(),
             channelValue = channelValue,
             pushAmount = pushAmount,
@@ -143,13 +141,12 @@ class OpenChannelPart1(val node: Node) : CliktCommand(name = "openchannel1", hel
     }
 }
 
-class OpenChannelPart2(val node: Node) : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
+class OpenChannelPart2() : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
     private val tempChannelId: String by option("--tempchannelID", help = "Temporary channel id").required()
 
     override fun run() {
         val tx: String = File("${Config.homeDir}/tx.txt").absoluteFile.readText(Charsets.UTF_8)
         broadcastFundingTx(
-            node = node,
             tempChannelId = tempChannelId,
             fundingTx = tx
         )
@@ -167,9 +164,9 @@ class GetBlockInfo : CliktCommand(name = "getblockinfo", help = "Print latest bl
     }
 }
 
-class GetNodeInfo(val node: Node) : CliktCommand(name = "getnodeinfo", help = "Print node information") {
+class GetNodeInfo() : CliktCommand(name = "getnodeinfo", help = "Print node information") {
     private val terminal: Terminal = Terminal()
-    private val nodeId: String = getNodeId(node)
+    private val nodeId: String = getNodeId()
     private val status: String = green("⬤  Up and running")
 
     override fun run() {

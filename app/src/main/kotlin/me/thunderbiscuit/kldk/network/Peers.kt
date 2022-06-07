@@ -7,9 +7,9 @@ import org.ldk.structs.Result__u832APIErrorZ
 import org.ldk.structs.UserConfig
 import java.net.InetSocketAddress
 
-fun connectPeer(node: Node, pubkey: String, hostname: String, port: Int): String {
+fun connectPeer(pubkey: String, hostname: String, port: Int): String {
     return try {
-        node.peerHandler.connect(
+        Node.peerHandler.connect(
             pubkey.toByteArray(),
             InetSocketAddress(hostname, port),
             5000
@@ -21,23 +21,21 @@ fun connectPeer(node: Node, pubkey: String, hostname: String, port: Int): String
 }
 
 fun createFundingTx(
-    node: Node,
     pubkey: ByteArray,
     channelValue: Long,
     pushAmount: Long = 0,
     userChannelId: Long,
     overrideConfig: UserConfig? = null
 ): Result__u832APIErrorZ? {
-    val result: Result__u832APIErrorZ? = node.channelManager.create_channel(pubkey, channelValue, pushAmount, userChannelId, overrideConfig)
+    val result: Result__u832APIErrorZ? = Node.channelManager.create_channel(pubkey, channelValue, pushAmount, userChannelId, overrideConfig)
     return result
 }
 
 fun broadcastFundingTx(
-    node: Node,
     tempChannelId: String,
     fundingTx: String,
 ): Result_NoneAPIErrorZ? {
-    return node.channelManager.funding_transaction_generated(tempChannelId.toByteArray(), fundingTx.toByteArray())
+    return Node.channelManager.funding_transaction_generated(tempChannelId.toByteArray(), fundingTx.toByteArray())
 }
 
 // fun listChannels(): Array<out ChannelDetails>? {

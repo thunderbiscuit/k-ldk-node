@@ -11,31 +11,8 @@ import org.ldk.structs.*
 import java.io.File
 import java.nio.channels.Channel
 
-// private val MuLogger = KotlinLogging.logger("BaseLogger")
-
-// class Node(
-//     val peerHandler: NioPeerHandler,
-//     val peerManager: PeerManager,
-//     val channelManager: ChannelManager,
-// )
-// {
-    // fun finalize() {
-    //     println("Node is being garbage collected!")
-    // //     MuLogger.info {
-    // //         """
-    // //             #############################
-    // //             Node object has been garbage collected!
-    // //             #############################
-    // //         """
-    // //     }
-    // }
-// }
-
-data class CoreNodeElements(
-    val peerHandler: NioPeerHandler,
-    val peerManager: PeerManager,
-    val channelManager: ChannelManager
-)
+// don't know why but this helps the Node object not being garbage collected !?!
+private val MuLogger = KotlinLogging.logger("BaseLogger")
 
 object Node {
     val peerHandler: NioPeerHandler
@@ -161,3 +138,9 @@ fun startNode(): CoreNodeElements {
         throw e
     }
 }
+
+data class CoreNodeElements(
+    val peerHandler: NioPeerHandler,
+    val peerManager: PeerManager,
+    val channelManager: ChannelManager
+)
