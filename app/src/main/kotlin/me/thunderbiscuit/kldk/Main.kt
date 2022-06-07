@@ -18,36 +18,12 @@ import com.github.ajalt.mordant.table.table
 import com.github.ajalt.mordant.terminal.Terminal
 import me.thunderbiscuit.kldk.network.*
 import me.thunderbiscuit.kldk.utils.getNodeId
-import mu.KotlinLogging
-import org.ldk.batteries.NioPeerHandler
-import org.ldk.structs.ChannelManager
-import org.ldk.structs.PeerManager
 import java.io.File
 
-private val MuLogger = KotlinLogging.logger("BaseLogger")
-
-object Node {
-
-    var peerHandler: NioPeerHandler? = null
-    var peerManager: PeerManager? = null
-    var channelManager: ChannelManager? = null
-
-    // fun finalize() {
-    //     println("Node object has been garbage collected!")
-    //     MuLogger.info {
-    //         """
-    //             #############################
-    //             Node object has been garbage collected!
-    //             #############################
-    //         """
-    //     }
-    // }
-}
-
 fun main() {
-    println(green("Hello, ${Config.nodeName}!\n"))
-
-    val Node = Node
+    println(green("Kldk starting..."))
+    val node: Node = startNode()
+    println(green("Up and running!\n"))
 
     while (true) {
         print("Kldk ❯❯❯ ")
@@ -57,13 +33,12 @@ fun main() {
             Kldk()
                 .subcommands(
                     Help(),
-                    StartNode(Node),
-                    ConnectToPeer(),
-                    ListPeers(),
-                    OpenChannelPart1(),
-                    OpenChannelPart2(),
+                    ConnectToPeer(node),
+                    ListPeers(node),
+                    OpenChannelPart1(node),
+                    OpenChannelPart2(node),
                     GetBlockInfo(),
-                    GetNodeInfo(),
+                    GetNodeInfo(node),
                     Shutdown(),
                     Exit()
                 )
@@ -103,16 +78,7 @@ class Help : CliktCommand(name = "help", help = "Print help output") {
     }
 }
 
-class StartNode(Node: Node) : CliktCommand(help = "Start your Kldk node", name = "startnode") {
-    override fun run() {
-        echo(green("Kldk starting..."))
-        startNode(Node)
-        // startNode(peerHandler, peerManager, channelManager)
-        echo(green("Up and running!"))
-    }
-}
-
-class ConnectToPeer : CliktCommand(name = "connectpeer", help = "Connect to a peer") {
+class ConnectToPeer(val node: Node) : CliktCommand(name = "connectpeer", help = "Connect to a peer") {
     private val pubkey by option("--pubkey", help="Peer public key (required)").required()
     private val ip by option("--ip", help="Peer ip address (required)").required()
     private val port by option("--port", help="Peer port (required)").int().required()
@@ -121,6 +87,7 @@ class ConnectToPeer : CliktCommand(name = "connectpeer", help = "Connect to a pe
         val peer: String = "$pubkey@$ip:$port"
         echo(green("Kldk attempting to connect to peer ") + green(peer))
         val message = connectPeer(
+            node = node,
             pubkey = pubkey,
             hostname = ip,
             port = port
@@ -129,11 +96,11 @@ class ConnectToPeer : CliktCommand(name = "connectpeer", help = "Connect to a pe
     }
 }
 
-class ListPeers : CliktCommand(name = "listpeers", help = "Print a list of connected peers") {
+class ListPeers(val node: Node) : CliktCommand(name = "listpeers", help = "Print a list of connected peers") {
     private val terminal = Terminal()
 
     override fun run() {
-        val peers: List<String> = listPeers()
+        val peers: List<String> = listPeers(node = node)
         when {
             peers.isEmpty() -> echo(green("No connected peers at the moment"))
             else -> terminal.println(
@@ -155,7 +122,7 @@ class ListPeers : CliktCommand(name = "listpeers", help = "Print a list of conne
     }
 }
 
-class OpenChannelPart1 : CliktCommand(name = "openchannel1", help = "Open a channel part 1") {
+class OpenChannelPart1(val node: Node) : CliktCommand(name = "openchannel1", help = "Open a channel part 1") {
     private val pubkey by option("--pubkey", help = "Peer public key (required)").required()
     private val channelValue by option("--channelvalue", help = "Channel value in millisatoshi (required)").long().required()
     private val pushAmount by option("--pushamount", help = "Amount to push to the counterparty as part of the open, in millisatoshi (required)").long().required()
@@ -163,6 +130,7 @@ class OpenChannelPart1 : CliktCommand(name = "openchannel1", help = "Open a chan
 
     override fun run() {
         val response = createFundingTx(
+            node = node,
             pubkey = pubkey.toByteArray(),
             channelValue = channelValue,
             pushAmount = pushAmount,
@@ -175,12 +143,13 @@ class OpenChannelPart1 : CliktCommand(name = "openchannel1", help = "Open a chan
     }
 }
 
-class OpenChannelPart2 : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
+class OpenChannelPart2(val node: Node) : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
     private val tempChannelId: String by option("--tempchannelID", help = "Temporary channel id").required()
 
     override fun run() {
         val tx: String = File("${Config.homeDir}/tx.txt").absoluteFile.readText(Charsets.UTF_8)
         broadcastFundingTx(
+            node = node,
             tempChannelId = tempChannelId,
             fundingTx = tx
         )
@@ -198,10 +167,10 @@ class GetBlockInfo : CliktCommand(name = "getblockinfo", help = "Print latest bl
     }
 }
 
-class GetNodeInfo : CliktCommand(name = "getnodeinfo", help = "Print node information") {
+class GetNodeInfo(val node: Node) : CliktCommand(name = "getnodeinfo", help = "Print node information") {
     private val terminal: Terminal = Terminal()
-    private val nodeId: String = getNodeId()
-    private val status: String = if (Node.peerManager != null) green("⬤  Up and running") else red("⬤  Node is down")
+    private val nodeId: String = getNodeId(node)
+    private val status: String = green("⬤  Up and running")
 
     override fun run() {
         terminal.println(
@@ -242,7 +211,6 @@ const val rootHelpMessage = """
     |
     |Commands:
     |  help          Print the root help output
-    |  startnode     Start your Kldk node
     |  connectpeer   Connect to a peer
     |  listpeers     Print a list of connected peers
     |  getblockinfo  Print latest block height and hash

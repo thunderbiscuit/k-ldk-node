@@ -3,12 +3,34 @@ package me.thunderbiscuit.kldk
 import me.thunderbiscuit.kldk.node.*
 import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.toByteArray
+import mu.KotlinLogging
 import org.ldk.batteries.ChannelManagerConstructor
+import org.ldk.batteries.NioPeerHandler
 import org.ldk.enums.Network
 import org.ldk.structs.*
 import java.io.File
 
-fun startNode(Node: Node) {
+// private val MuLogger = KotlinLogging.logger("BaseLogger")
+
+class Node(
+    val peerHandler: NioPeerHandler,
+    val peerManager: PeerManager,
+    val channelManager: ChannelManager,
+)
+// {
+    // fun finalize() {
+    //     println("Node is being garbage collected!")
+    // //     MuLogger.info {
+    // //         """
+    // //             #############################
+    // //             Node object has been garbage collected!
+    // //             #############################
+    // //         """
+    // //     }
+    // }
+// }
+
+fun startNode(): Node {
 
     val feeEstimator: FeeEstimator = FeeEstimator.new_impl(KldkFeeEstimator)
     // The other way to provide the interface is by using Kotlin SAM conversion
@@ -72,7 +94,7 @@ fun startNode(Node: Node) {
         (System.currentTimeMillis() * 1000).toInt()
     )
 
-    try {
+    return try {
         val channelManagerConstructor: ChannelManagerConstructor? = when (serializedChannelManager) {
             // first time booting up the node
             null -> ChannelManagerConstructor(
@@ -94,10 +116,10 @@ fun startNode(Node: Node) {
             }
         }
 
-        Node.channelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
+        val channelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
         channelManagerConstructor.chain_sync_completed(eventHandler, scorer)
-        Node.peerHandler = channelManagerConstructor.nio_peer_handler
-        Node.peerManager = channelManagerConstructor.peer_manager
+        val peerHandler = channelManagerConstructor.nio_peer_handler
+        val peerManager = channelManagerConstructor.peer_manager
 
         // val bestHeader: ByteArray = runBlocking {
         //     getLatestBlockHeader()
@@ -111,7 +133,10 @@ fun startNode(Node: Node) {
         // chainMonitor.update_best_block(best_header, best_height)
         // chainMonitor.best_block_updated()
         // channelManager.as_Confirm()
+
+        Node(peerHandler, peerManager, channelManager)
     } catch (e: Throwable) {
         println("Kldk startup error: $e")
+        throw e
     }
 }
