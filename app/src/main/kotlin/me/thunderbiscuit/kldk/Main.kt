@@ -47,7 +47,7 @@ object Node {
 fun main() {
     println(green("Hello, ${Config.nodeName}!\n"))
 
-    val Node = Node
+    // val Node = Node
 
     while (true) {
         print("Kldk ❯❯❯ ")
