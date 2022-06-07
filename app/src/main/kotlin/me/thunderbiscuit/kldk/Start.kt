@@ -11,23 +11,6 @@ import org.ldk.structs.*
 import java.io.File
 import java.nio.channels.Channel
 
-// don't know why but this helps the Node object not being garbage collected !?!
-private val MuLogger = KotlinLogging.logger("BaseLogger")
-
-object Node {
-    val peerHandler: NioPeerHandler
-    val peerManager: PeerManager
-    val channelManager: ChannelManager
-
-    init {
-        val coreNodeElements: CoreNodeElements = startNode()
-        // peerHandler, peerManager, channelManager = startNode() // doesn't work
-        peerHandler = coreNodeElements.peerHandler
-        peerManager = coreNodeElements.peerManager
-        channelManager = coreNodeElements.channelManager
-    }
-}
-
 fun startNode(): CoreNodeElements {
 
     val feeEstimator: FeeEstimator = FeeEstimator.new_impl(KldkFeeEstimator)
