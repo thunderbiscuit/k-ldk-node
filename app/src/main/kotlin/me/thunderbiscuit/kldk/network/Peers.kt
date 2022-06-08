@@ -7,7 +7,7 @@ import org.ldk.structs.Result__u832APIErrorZ
 import org.ldk.structs.UserConfig
 import java.net.InetSocketAddress
 
-fun connectPeer(pubkey: String, hostname: String, port: Int): String {
+fun connectPeer(Node: Node, pubkey: String, hostname: String, port: Int): String {
     return try {
         Node.peerHandler.connect(
             pubkey.toByteArray(),
@@ -21,6 +21,7 @@ fun connectPeer(pubkey: String, hostname: String, port: Int): String {
 }
 
 fun createFundingTx(
+    Node: Node,
     pubkey: ByteArray,
     channelValue: Long,
     pushAmount: Long = 0,
@@ -32,6 +33,7 @@ fun createFundingTx(
 }
 
 fun broadcastFundingTx(
+    Node: Node,
     tempChannelId: String,
     fundingTx: String,
 ): Result_NoneAPIErrorZ? {
