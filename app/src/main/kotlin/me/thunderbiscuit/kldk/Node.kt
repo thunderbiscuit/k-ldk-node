@@ -3,7 +3,6 @@ package me.thunderbiscuit.kldk
 import me.thunderbiscuit.kldk.node.*
 import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.toByteArray
-import mu.KotlinLogging
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.batteries.NioPeerHandler
 import org.ldk.enums.Network
@@ -15,12 +14,13 @@ import java.io.File
 // so we can use them throughout the app and they don't get garbage collected
 object Node {
 
-
     lateinit var peerHandler: NioPeerHandler
     lateinit var peerManager: PeerManager
     lateinit var channelManager: ChannelManager
     private lateinit var channelManagerConstructor: ChannelManagerConstructor
 
+    // the init block gets run only once upon initialization of the object
+    // the startNode method sets the 4 lateinit variables above
     init {
         startNode()
     }
@@ -93,7 +93,9 @@ object Node {
             (System.currentTimeMillis() * 1000).toInt()
         )
 
-        return try {
+        // Create the 4 variables we need in the Node object
+        // channelManagerConstructor, channelManager, peerHandler, peerManager
+        try {
             this.channelManagerConstructor = when (serializedChannelManager) {
                 // first time booting up the node
                 null -> ChannelManagerConstructor(
@@ -114,11 +116,11 @@ object Node {
                     throw(IllegalStateException("Reboot currently not supported"))
                 }
             }
-
             this.channelManager = channelManagerConstructor.channel_manager
-            channelManagerConstructor.chain_sync_completed(eventHandler, scorer)
             this.peerHandler = channelManagerConstructor.nio_peer_handler
             this.peerManager = channelManagerConstructor.peer_manager
+
+            channelManagerConstructor.chain_sync_completed(eventHandler, scorer)
 
             // val bestHeader: ByteArray = runBlocking {
             //     getLatestBlockHeader()
