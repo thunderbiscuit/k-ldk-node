@@ -76,7 +76,7 @@ fun startNode(): CoreNodeElements {
     )
 
     return try {
-        val channelManagerConstructor: ChannelManagerConstructor? = when (serializedChannelManager) {
+        val channelManagerConstructor: ChannelManagerConstructor = when (serializedChannelManager) {
             // first time booting up the node
             null -> ChannelManagerConstructor(
                         network,
@@ -97,7 +97,7 @@ fun startNode(): CoreNodeElements {
             }
         }
 
-        val channelManager = channelManagerConstructor?.channel_manager ?: throw IllegalStateException("Channel manager has not been initialized")
+        val channelManager = channelManagerConstructor.channel_manager
         channelManagerConstructor.chain_sync_completed(eventHandler, scorer)
         val peerHandler = channelManagerConstructor.nio_peer_handler
         val peerManager = channelManagerConstructor.peer_manager
@@ -115,7 +115,7 @@ fun startNode(): CoreNodeElements {
         // chainMonitor.best_block_updated()
         // channelManager.as_Confirm()
 
-        CoreNodeElements(peerHandler, peerManager, channelManager)
+        CoreNodeElements(peerHandler, peerManager, channelManager, channelManagerConstructor)
     } catch (e: Throwable) {
         println("Kldk startup error: $e")
         throw e
@@ -125,5 +125,6 @@ fun startNode(): CoreNodeElements {
 data class CoreNodeElements(
     val peerHandler: NioPeerHandler,
     val peerManager: PeerManager,
-    val channelManager: ChannelManager
+    val channelManager: ChannelManager,
+    val channelManagerConstructor: ChannelManagerConstructor,
 )
