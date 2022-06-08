@@ -6,7 +6,8 @@ Build the node:
 ./gradlew installDist
 ```
 
-Start the REPL:
+Start the REPL on testnet:
 ```shell
 cd ./app/build/install/kldk/bin/
 ./kldk
+```
