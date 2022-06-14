@@ -1,5 +1,14 @@
 # Readme
 
+This node is an attempt at creating a fully working Lightning node using [ldk-java]() and [bdk-kotlin](). It's a work in progress:
+
+- [x] Connect to peers
+- [ ] Open channels (halfway there)
+- [ ] Send payments
+- [ ] Receive payments
+- [ ] Close channels
+
+## Building and using the node
 Build the node:
 ```shell
 # this will create an executable in ./app/build/install/kldk/bin/
