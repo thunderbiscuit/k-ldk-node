@@ -3,6 +3,8 @@ package me.thunderbiscuit.kldk
 import me.thunderbiscuit.kldk.node.*
 import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.toByteArray
+import me.thunderbiscuit.kldk.utils.toHex
+import org.bitcoindevkit.DescriptorSecretKey
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.batteries.NioPeerHandler
 import org.ldk.enums.Network
@@ -11,7 +13,7 @@ import java.io.File
 
 // the Node singleton is really just a way to namespace and keep references to
 // the peerHandler, peerManager, channelManager, and channelManagerConstructor
-// so we can use them throughout the app and they don't get garbage collected
+// so we can use them throughout the app, and they don't get garbage collected
 object Node {
 
     lateinit var peerHandler: NioPeerHandler
@@ -44,7 +46,7 @@ object Node {
         val transactionBroadcaster: BroadcasterInterface = BroadcasterInterface.new_impl(KldkBroadcaster)
 
         val network: Network = if (Config.network == "regtest") Network.LDKNetwork_Regtest else Network.LDKNetwork_Testnet
-        val networkGraph = NetworkGraph.of((Config.genesisHash.toByteArray()).reversedArray())
+        val networkGraph = NetworkGraph.of((Config.genesisHash.toByteArray()).reversedArray(), logger)
 
         val persister: Persist = Persist.new_impl(KldkPersister)
 
@@ -70,7 +72,10 @@ object Node {
         }
         val channelMonitors: Array<ByteArray> = channelMonitorsList.toTypedArray()
 
+        // val handshake = ChannelHandshakeConfig.with_default()
+        // handshake._announced_channel = true
         val userConfig: UserConfig = UserConfig.with_default()
+        // userConfig._channel_handshake_config = handshake
 
         // val transactionFilter: Option_FilterZ? = null
         // val filter: Option_FilterZ = Option_FilterZ.some(txFilter)
@@ -84,11 +89,14 @@ object Node {
             persister
         )
 
-        val scorer: MultiThreadedLockableScore = MultiThreadedLockableScore.of(Scorer.with_default().as_Score())
+        // val scorer: MultiThreadedLockableScore = MultiThreadedLockableScore.of(Scorer.with_default().as_Score())
+        val scorerParameters: ProbabilisticScoringParameters = ProbabilisticScoringParameters.with_default()
+        val probabilisticScorer: ProbabilisticScorer = ProbabilisticScorer.of(scorerParameters, networkGraph, logger)
+        val scorer: MultiThreadedLockableScore = MultiThreadedLockableScore.of(probabilisticScorer.as_Score())
 
-        val entropy: String = Config.entropy
+        val entropy: ByteArray = getStartingEntropy(Config.mnemonic)
         val keysManager: KeysManager = KeysManager.of(
-            entropy.toByteArray(),
+            entropy,
             System.currentTimeMillis() / 1000,
             (System.currentTimeMillis() * 1000).toInt()
         )
@@ -139,5 +147,17 @@ object Node {
             println("Kldk startup error: $e")
             throw e
         }
+    }
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    private fun getStartingEntropy(mnemonic: String): ByteArray {
+         val entropy: ByteArray = DescriptorSecretKey(
+             network = org.bitcoindevkit.Network.TESTNET,
+             mnemonic = mnemonic,
+             password = null,
+        ).secretBytes().toUByteArray().toByteArray()
+
+        println("Entropy used for LDK is ${entropy.toHex()}")
+        return entropy
     }
 }
