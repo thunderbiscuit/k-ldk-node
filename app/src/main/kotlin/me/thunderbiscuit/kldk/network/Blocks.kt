@@ -6,11 +6,14 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import me.thunderbiscuit.kldk.utils.toHex
+import org.bitcoindevkit.BlockchainConfig
 
 // Blockstream API docs at https://github.com/Blockstream/esplora/blob/master/API.md
 
-// All those calls should eventually be performed using the Bitcoin Dev Kit, which would
+// All those calls should eventually be performed using the Bitcoin Development Kit, which would
 // enable more flexibility (choice of bitcoin daemon, electrum server, etc.)
+
+// val blockchainConfig: BlockchainConfig = BlockchainConfig()
 
 suspend fun getLatestBlockHash(): String {
     val client = HttpClient(CIO)

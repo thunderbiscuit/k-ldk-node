@@ -95,7 +95,7 @@ class ConnectToPeer(val Node: Node) : CliktCommand(name = "connectpeer", help = 
     private val port by option("--port", help="Peer port (required)").int().required()
 
     override fun run() {
-        val peer: String = "$pubkey@$ip:$port"
+        val peer = "$pubkey@$ip:$port"
         echo(green("Kldk attempting to connect to peer ") + green(peer))
         val message = connectPeer(
             Node = Node,
@@ -156,12 +156,14 @@ class OpenChannelPart1(val Node: Node) : CliktCommand(name = "openchannel1", hel
 
 class OpenChannelPart2(val Node: Node) : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
     private val tempChannelId: String by option("--tempchannelID", help = "Temporary channel id").required()
+    private val counterPartyNodeId: String by option("--counterpartynodeID", help = "Counterparty node id").required()
 
     override fun run() {
         val tx: String = File("${Config.homeDir}/tx.txt").absoluteFile.readText(Charsets.UTF_8)
         broadcastFundingTx(
             Node = Node,
             tempChannelId = tempChannelId,
+            counterPartyNodeId = counterPartyNodeId,
             fundingTx = tx
         )
     }

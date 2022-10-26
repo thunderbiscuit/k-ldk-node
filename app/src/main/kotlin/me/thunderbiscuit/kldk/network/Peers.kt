@@ -35,9 +35,10 @@ fun createFundingTx(
 fun broadcastFundingTx(
     Node: Node,
     tempChannelId: String,
+    counterPartyNodeId: String,
     fundingTx: String,
 ): Result_NoneAPIErrorZ? {
-    return Node.channelManager.funding_transaction_generated(tempChannelId.toByteArray(), fundingTx.toByteArray())
+    return Node.channelManager.funding_transaction_generated(tempChannelId.toByteArray(), counterPartyNodeId.toByteArray(), fundingTx.toByteArray())
 }
 
 // fun listChannels(): Array<out ChannelDetails>? {

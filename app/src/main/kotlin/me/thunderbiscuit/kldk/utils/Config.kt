@@ -9,7 +9,8 @@ object Config {
     private val config: com.typesafe.config.Config = ConfigFactory.load()
 
     val homeDir: String = config.getString("kldk.homeDir")
-    val entropy: String = config.getString("kldk.entropy")
+    val mnemonic: String = config.getString("kldk.mnemonic")
+    // val entropy: String = config.getString("kldk.entropy")
     val genesisHash: String = config.getString("kldk.genesisHash")
     val network: String = config.getString("kldk.network")
 

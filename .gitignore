@@ -25,3 +25,4 @@ out/
 
 # app config file
 app/src/main/resources/application.conf
+notes.md

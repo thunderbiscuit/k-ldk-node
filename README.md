@@ -1,6 +1,6 @@
 # Readme
 
-This node is an attempt at creating a fully working Lightning node using [ldk-java]() and [bdk-kotlin](). It's a work in progress:
+This node is an attempt at creating a fully working Lightning node using [ldk-java](https://github.com/lightningdevkit/ldk-garbagecollected) and [bdk-kotlin](https://github.com/bitcoindevkit/bdk-kotlin). It's a work in progress:
 
 - [x] Connect to peers
 - [ ] Open channels (halfway there)

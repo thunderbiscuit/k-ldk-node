@@ -29,6 +29,10 @@ object KldkEventHandler : ChannelManagerConstructor.EventHandler {
     override fun persist_network_graph(network_graph: ByteArray?) {
         println("Implement network graph persistence")
     }
+
+    override fun persist_scorer(scorer_bytes: ByteArray?) {
+        println("Implement scorer persistence")
+    }
 }
 
 fun channelClosedEvent(event: Event.ChannelClosed) {

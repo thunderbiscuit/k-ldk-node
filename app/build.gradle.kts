@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.6.21"
+    kotlin("jvm") version "1.7.10"
     application
 }
 
@@ -29,7 +29,10 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.11")
 
     // lightningdevkit
-    implementation("org.lightningdevkit:ldk-java:0.0.106.0")
+    implementation("org.lightningdevkit:ldk-java:0.0.110.2")
+
+    // bitcoindevkit
+    implementation("org.bitcoindevkit:bdk-jvm:0.10.0")
 
     testImplementation(kotlin("test"))
 }
