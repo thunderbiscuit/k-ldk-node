@@ -13,6 +13,7 @@ object Config {
     // val entropy: String = config.getString("kldk.entropy")
     val genesisHash: String = config.getString("kldk.genesisHash")
     val network: String = config.getString("kldk.network")
+    val electrumUrl: String = config.getString("kldk.electrumUrl")
 
     // You can define latestBlockHash and latestBlockHeight in the config file
     // I used these initially because I was going to use regtest and didn't implement an API call to get them

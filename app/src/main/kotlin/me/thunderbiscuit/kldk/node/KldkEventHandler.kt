@@ -1,8 +1,12 @@
 package me.thunderbiscuit.kldk.node
 
+import me.thunderbiscuit.kldk.Node
+import me.thunderbiscuit.kldk.network.broadcastFundingTx
+import me.thunderbiscuit.kldk.network.buildOnChainTx
 import me.thunderbiscuit.kldk.utils.Config
 import me.thunderbiscuit.kldk.utils.toHex
 import mu.KotlinLogging
+import org.bitcoindevkit.Network
 import org.ldk.batteries.ChannelManagerConstructor
 import org.ldk.structs.Event
 import java.io.File
@@ -50,6 +54,14 @@ fun fundingGenerationReady(event: Event.FundingGenerationReady) {
     println("The output script for the funding transaction is: ${event.output_script.toHex()}")
     println("The channel value in satoshis for the funding transaction is: ${event.channel_value_satoshis}")
     println("The temporary channel ID for the funding transaction is: ${event.temporary_channel_id.toHex()}")
+    val fundingTx: ByteArray = buildOnChainTx(
+        network = Network.TESTNET,
+        value = event.channel_value_satoshis,
+        script = event.output_script
+    )
+    println("The funding tx is ${fundingTx.toHex()}")
+    // broadcastFundingTx(Node, event.temporary_channel_id, event.counterparty_node_id, fundingTx)
+
     MuLogger.info { "We just had a FundingGenerationReady event" }
     MuLogger.info { "The output script for the funding transaction is: ${event.output_script.toHex()}" }
     MuLogger.info { "The channel value in satoshis for the funding transaction is: ${event.channel_value_satoshis}" }

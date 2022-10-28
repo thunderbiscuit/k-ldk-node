@@ -29,7 +29,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.11")
 
     // lightningdevkit
-    implementation("org.lightningdevkit:ldk-java:0.0.110.2")
+    implementation("org.lightningdevkit:ldk-java:0.0.111.0")
 
     // bitcoindevkit
     implementation("org.bitcoindevkit:bdk-jvm:0.10.0")

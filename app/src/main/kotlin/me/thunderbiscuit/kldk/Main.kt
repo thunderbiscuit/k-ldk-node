@@ -29,8 +29,7 @@ fun main() {
     val helpCommand = Help()
     val connectToPeerCommand = ConnectToPeer(Node)
     val listPeersCommand = ListPeers(Node)
-    val openChannelPart1Command = OpenChannelPart1(Node)
-    val openChannelPart2Command = OpenChannelPart2(Node)
+    val openChannelCommand = OpenChannel(Node)
     val getBlockInfoCommand = GetBlockInfo()
     val getNodeInfoCommand = GetNodeInfo(Node)
     val shutdownCommand = Shutdown()
@@ -46,8 +45,7 @@ fun main() {
                     helpCommand,
                     connectToPeerCommand,
                     listPeersCommand,
-                    openChannelPart1Command,
-                    openChannelPart2Command,
+                    openChannelCommand,
                     getBlockInfoCommand,
                     getNodeInfoCommand,
                     shutdownCommand,
@@ -133,7 +131,7 @@ class ListPeers(val Node: Node) : CliktCommand(name = "listpeers", help = "Print
     }
 }
 
-class OpenChannelPart1(val Node: Node) : CliktCommand(name = "openchannel1", help = "Open a channel part 1") {
+class OpenChannel(val Node: Node) : CliktCommand(name = "openchannel", help = "Open a channel") {
     private val pubkey by option("--pubkey", help = "Peer public key (required)").required()
     private val channelValue by option("--channelvalue", help = "Channel value in millisatoshi (required)").long().required()
     private val pushAmount by option("--pushamount", help = "Amount to push to the counterparty as part of the open, in millisatoshi (required)").long().required()
@@ -145,7 +143,7 @@ class OpenChannelPart1(val Node: Node) : CliktCommand(name = "openchannel1", hel
             pubkey = pubkey.toByteArray(),
             channelValue = channelValue,
             pushAmount = pushAmount,
-            userChannelId = userChannelId
+            userChannelId = userChannelId,
         )
         when (response) {
             is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> echo("Channel open request was sent.")
@@ -154,20 +152,41 @@ class OpenChannelPart1(val Node: Node) : CliktCommand(name = "openchannel1", hel
     }
 }
 
-class OpenChannelPart2(val Node: Node) : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
-    private val tempChannelId: String by option("--tempchannelID", help = "Temporary channel id").required()
-    private val counterPartyNodeId: String by option("--counterpartynodeID", help = "Counterparty node id").required()
-
-    override fun run() {
-        val tx: String = File("${Config.homeDir}/tx.txt").absoluteFile.readText(Charsets.UTF_8)
-        broadcastFundingTx(
-            Node = Node,
-            tempChannelId = tempChannelId,
-            counterPartyNodeId = counterPartyNodeId,
-            fundingTx = tx
-        )
-    }
-}
+// class OpenChannelPart1(val Node: Node) : CliktCommand(name = "openchannel1", help = "Open a channel part 1") {
+//     private val pubkey by option("--pubkey", help = "Peer public key (required)").required()
+//     private val channelValue by option("--channelvalue", help = "Channel value in millisatoshi (required)").long().required()
+//     private val pushAmount by option("--pushamount", help = "Amount to push to the counterparty as part of the open, in millisatoshi (required)").long().required()
+//     private val userChannelId by option("--userchannelID", help = "User channel ID (required)").long().required()
+//
+//     override fun run() {
+//         val response = createFundingTx(
+//             Node = Node,
+//             pubkey = pubkey.toByteArray(),
+//             channelValue = channelValue,
+//             pushAmount = pushAmount,
+//             userChannelId = userChannelId
+//         )
+//         when (response) {
+//             is Result__u832APIErrorZ.Result__u832APIErrorZ_OK -> echo("Channel open request was sent.")
+//             is Result__u832APIErrorZ.Result__u832APIErrorZ_Err -> echo("Channel open request was not sent. Error is ${response.err}")
+//         }
+//     }
+// }
+//
+// class OpenChannelPart2(val Node: Node) : CliktCommand(name = "openchannel2", help = "Broadcast the funding transaction") {
+//     private val tempChannelId: String by option("--tempchannelID", help = "Temporary channel id").required()
+//     private val counterPartyNodeId: String by option("--counterpartynodeID", help = "Counterparty node id").required()
+//
+//     override fun run() {
+//         val tx: String = File("${Config.homeDir}/tx.txt").absoluteFile.readText(Charsets.UTF_8)
+//         broadcastFundingTx(
+//             Node = Node,
+//             tempChannelId = tempChannelId,
+//             counterPartyNodeId = counterPartyNodeId,
+//             fundingTx = tx
+//         )
+//     }
+// }
 
 class GetBlockInfo : CliktCommand(name = "getblockinfo", help = "Print latest block height and hash") {
     override fun run() {
@@ -227,8 +246,7 @@ const val rootHelpMessage = """
     |  connectpeer   Connect to a peer
     |  listpeers     Print a list of connected peers
     |  getblockinfo  Print latest block height and hash
-    |  openchannel1  Negotiate the funding transaction with a peer
-    |  openchannel2  Broadcast the funding transaction
+    |  openchannel   Open a channel
     |  getnodeinfo   Print node information
     |  shutdown      Shutdown node
     |  exit          Exit REPL"""
